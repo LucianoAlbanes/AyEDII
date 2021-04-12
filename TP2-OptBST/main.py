@@ -1,6 +1,7 @@
 # Some testing for binary tree adt implementation
 import random  # Only for testing
 from mybinarytree import BinaryTree, insert, deleteKey, traverseInPreOrder
+import mybinarytree
 from linkedlist import access, length
 
 
@@ -70,3 +71,4 @@ print('\n-------------------------\nImprimiendo keys en pre orden\n-------------
 
 '''
 printList(traverseInPreOrder(tree))
+print(mybinarytree.access(tree, 8))

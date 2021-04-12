@@ -4,8 +4,10 @@ from linkedlist import LinkedList, add
 
 # Define classes.
 
+
 class BinaryTree:
     root = None
+
 
 class BinaryTreeNode:
     key = None
@@ -15,6 +17,7 @@ class BinaryTreeNode:
     parent = None
 
 # Define functions
+
 
 def search(binaryTree, element):
     '''
@@ -33,6 +36,7 @@ def search(binaryTree, element):
     if foundNode:
         return foundNode.key
 
+
 def searchAux(actualNode, element):
     # Empty node case.
     if not actualNode:
@@ -50,6 +54,7 @@ def searchAux(actualNode, element):
 
     # Return the pointer of the node
     return foundNode
+
 
 def insert(binaryTree, element, key):
     '''
@@ -81,6 +86,7 @@ def insert(binaryTree, element, key):
     insertAux(binaryTree.root, newNode)
     return key
 
+
 def insertAux(actualNode, newNode):
     # Left node case.
     if actualNode.key > newNode.key:
@@ -97,6 +103,7 @@ def insertAux(actualNode, newNode):
             newNode.parent = actualNode
         else:
             insertAux(actualNode.rightnode, newNode)
+
 
 def delete(binaryTree, element):
     '''
@@ -117,12 +124,13 @@ def delete(binaryTree, element):
     # Not found case
     if not nodeToDelete:
         return None
-    
+
     # Delete using aux fn
     deleteAux(binaryTree, nodeToDelete)
 
     # Return key
     return nodeToDelete.key
+
 
 def deleteKey(binaryTree, key):
     '''
@@ -141,12 +149,13 @@ def deleteKey(binaryTree, key):
     # Not found case
     if not nodeToDelete:
         return None
-    
+
     # Delete using aux fn
     deleteAux(binaryTree, nodeToDelete)
 
     # Return key
     return nodeToDelete.key
+
 
 def deleteAux(binaryTree, nodeToDelete):
     # Caso nodo hoja
@@ -158,9 +167,9 @@ def deleteAux(binaryTree, nodeToDelete):
     # Caso sin rama izquierda
     elif not nodeToDelete.leftnode:
         moveNodes(binaryTree, nodeToDelete.rightnode, nodeToDelete)
-    elif not nodeToDelete.rightnode: #Sin rama derecha
+    elif not nodeToDelete.rightnode:  # Sin rama derecha
         moveNodes(binaryTree, nodeToDelete.leftnode, nodeToDelete)
-    else: # ambas ramas
+    else:  # ambas ramas
         # Define successor
         successorNode = nodeToDelete.rightnode
         while successorNode.leftnode:
@@ -179,15 +188,16 @@ def deleteAux(binaryTree, nodeToDelete):
         successorNode.leftnode = nodeToDelete.leftnode
         successorNode.leftnode.parent = successorNode
 
+
 def moveNodes(binaryTree, fromNode, toNode):
     '''
     la fn transplante o moveNodes coloca al nodo fromNode en la posicion del nodo toNode.
     Permite que fromNode sea un nodo nulo.
     No es responsable de la actualizacion de los hijos de ningun nodo
     '''
-    if toNode is binaryTree.root: #Nodo viejo es raíz
+    if toNode is binaryTree.root:  # Nodo viejo es raíz
         binaryTree.root = fromNode
-    else: #Caso izq. o drch.
+    else:  # Caso izq. o drch.
         if toNode == toNode.parent.leftnode:
             toNode.parent.leftnode = fromNode
         else:
@@ -195,6 +205,7 @@ def moveNodes(binaryTree, fromNode, toNode):
     # Check si el nodo nuevo era nulo
     if fromNode:
         fromNode.parent = toNode.parent
+
 
 def checkKeyExistence(binaryTree, key):
     '''
@@ -214,6 +225,7 @@ def checkKeyExistence(binaryTree, key):
     # Search recursively using aux fn, and return a boolean.
     return checkKeyExistenceAux(binaryTree.root, key)
 
+
 def checkKeyExistenceAux(actualNode, key):
     # Empty node case.
     if not actualNode:
@@ -229,6 +241,11 @@ def checkKeyExistenceAux(actualNode, key):
         return checkKeyExistenceAux(actualNode.leftnode, key)
     else:
         return checkKeyExistenceAux(actualNode.rightnode, key)
+
+
+def access(binaryTree, key):
+    return checkKeyExistenceAux(binaryTree.root, key)
+
 
 def traverseInPreOrder(binaryTree):
     '''
@@ -253,12 +270,13 @@ def traverseInPreOrder(binaryTree):
     # Return the filled linked list.
     return nodesList
 
+
 def traverseInPreOrderAux(actualNode, linkedList):
     # Recursively go to all nodes, both sides, right to left
     if actualNode.rightnode:
         traverseInPreOrderAux(actualNode.rightnode, linkedList)
     if actualNode.leftnode:
         traverseInPreOrderAux(actualNode.leftnode, linkedList)
-        
+
     # Store the pointer in the linked list
     add(linkedList, actualNode)
