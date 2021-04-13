@@ -1,6 +1,5 @@
 # Some testing for binary tree adt implementation
 import random  # Only for testing
-from mybinarytree import BinaryTree, insert, deleteKey, traverseInPreOrder
 import mybinarytree
 from linkedlist import access, length
 
@@ -42,33 +41,20 @@ def printTree(actualNode, space):
 # TEST CODE
 
 # Create a tree
-tree = BinaryTree()
+tree = mybinarytree.BinaryTree()
 def x(n):
-    insert(tree, n, n)
+    mybinarytree.insert(tree, n, n)
 
 #Inserts
 nums = [10,8,12,14]
-for n in nums:
-    x(n)
+mybinarytree.insert(tree, 'Nico', 15)
+mybinarytree.insert(tree, 'Luciano', 19)
+mybinarytree.insert(tree, 'Mati', 10)
+mybinarytree.insert(tree, 'Humberto', 47)
 
 
-#print
-deleteKey(tree,12)
-printTree(tree.root,0)
+print(mybinarytree.update(tree, 'Andrea', 47))
+print(mybinarytree.getNode(tree, 119))
 
-'''
-print('\n-------------------------\nárbol binario casi aleatorio (?\n-------------------------\n')
 
 printTree(tree.root, 0)
-
-print('\n-------------------------\nEliminando hojas 101 y -1\n-------------------------\n')
-
-delete(tree, 'LeafR')
-delete(tree, 'LeafL')
-printTree(tree.root, 0)
-
-print('\n-------------------------\nImprimiendo keys en pre orden\n-------------------------\n')
-
-'''
-printList(traverseInPreOrder(tree))
-print(mybinarytree.access(tree, 8))
