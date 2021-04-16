@@ -42,14 +42,12 @@ def insert(avlTree, value, key):
     else: # General case
         insertAux(avlTree.root, newNode)
     
-    # Update heights from the inserted node to the root
+    # Update heights and bfs from the inserted node to the root
     calculateHeight(newNode)
-
-    # Update tree's bf
-    calculateBalance(avlTree)
+    calculateBalance(newNode)
 
     # Rebalance it
-    reBalance(avlTree)
+    reBalanceAux(avlTree, newNode)
 
     # Return key of inserted node
     return key
@@ -138,45 +136,31 @@ def rotateRight(avlTree, avlNode):
     # Return new root pointer
     return newRoot
 
-def calculateBalance(avlTree):
+def calculateBalance(avlNode):
     '''
     Explanation:
-        Calculates and sets the balanceFactor parameter of each node of an AVL-Tree.
+        Calculates and sets the balanceFactor parameter from avlNode to the root of an AVL-Tree.
     Params:
-        avlTree: The AVL-Tree in which you want to update their nodes'es balanceFactor.
+        avlNode: The node to update its balanceFactor, and its parents recursively.
     Info:
         This function DOESN'T UPDATE HEIGHTS, must be called calculateHeight() first.
-    Return:
-        The AVL-Tree.
-        Returns 'None' if the tree is empty.
     '''
-    # Check empty tree
-    if not avlTree.root:
-        return None
-    
-    # Call the recursive fn to calculate each bf from root.
-    calculateBalanceAux(avlTree.root)
-
-    # Return the tree
-    return avlTree
-
-def calculateBalanceAux(avlNode):
     ## This recursive fn calcs and update the bf of avlNode, reading child's heights.
     # Store the height of each child nodes, if exists
     hightL = 0
     hightR = 0
+    
     if avlNode.leftnode:
         hightL = avlNode.leftnode.height + 1
-        #Additionally, because this child exists, calculate his bf
-        calculateBalanceAux(avlNode.leftnode)
-
     if avlNode.rightnode:
         hightR = avlNode.rightnode.height + 1
-        #Additionally, because this child exists, calculate his bf
-        calculateBalanceAux(avlNode.rightnode)
 
     # Update the bf of the given node
     avlNode.balanceFactor = hightL - hightR
+
+    # Calc new bf of his parent, until root
+    if avlNode.parent:
+        calculateBalance(avlNode.parent)
 
 def calculateHeight(avlNode):
     '''
@@ -206,29 +190,16 @@ def calculateHeight(avlNode):
     if avlNode.parent:
         calculateHeight(avlNode.parent)
 
-def reBalance(avlTree):
+def reBalanceAux(avlTree, avlNode):
     '''
     Explanation:
-        Checks if the AVL tree is unbalanced and balance it.
+        Checks and rebalance an AVL-Tree from avlNode to root.
     Params:
         avlTree: The AVL-Tree to be balanced.
+        avlNode: The first node to be checked and rebalanced if is needed.
     Info:
         This function DOESN'T UPDATE BALANCE FACTORS, must be called calculateBalance() first.
-    Return:
-        The balanced AVL-Tree.
-        Returns 'None' if the tree is empty.
     '''
-    # Check case empty tree
-    if not avlTree.root:
-        return None
-    
-    # Call the recursive fn with root as parameter
-    reBalanceAux(avlTree, avlTree.root)
-
-    # Return the balanced tree
-    return avlTree
-
-def reBalanceAux(avlTree, avlNode):
     # Case inexistent node
     if not avlNode:
         return None 
@@ -242,8 +213,9 @@ def reBalanceAux(avlTree, avlNode):
             rotateLeft(avlTree, avlNode)
         
         # Re check actual node
-        calculateBalanceAux(avlNode.parent) # Update bf from avlNode
-        reBalanceAux(avlTree, avlNode.parent)
+        if avlNode.leftnode: calculateBalance(avlNode.leftnode) # Update bf from avlNode
+        if avlNode.rightnode: calculateBalance(avlNode.rightnode) # Update bf from avlNode
+        calculateBalance(avlNode) # Update bf from avlNode
 
     elif avlNode.balanceFactor > 1: # unbalanced to the left
         if avlNode.leftnode.balanceFactor < 0: # same reason
@@ -253,12 +225,12 @@ def reBalanceAux(avlTree, avlNode):
             rotateRight(avlTree, avlNode)
         
         # Re check actual node
-        calculateBalanceAux(avlNode.parent) # Update bf from avlNode
-        reBalanceAux(avlTree, avlNode.parent)
+        if avlNode.leftnode: calculateBalance(avlNode.leftnode) # Update bf from avlNode
+        if avlNode.rightnode: calculateBalance(avlNode.rightnode) # Update bf from avlNode
+        calculateBalance(avlNode)
     else:
-        # Continue recursively.
-        reBalanceAux(avlTree, avlNode.leftnode)
-        reBalanceAux(avlTree, avlNode.rightnode)
+        # Continue recursively until root
+        reBalanceAux(avlTree, avlNode.parent)
     
 
 #TEST
@@ -285,10 +257,35 @@ def printTree(actualNode, space):
     printTree(actualNode.leftnode, space)
 
 tree = AVLTree()
+'''import random
+for i in range(0,3):
+    f =random.randint(0,9999999)
+    insert(tree, f,f)
+    print(i)
+'''
 
-for i in range(0,6):
-    i+=1
-    insert(tree, i, i)
+### Checks if bf arfe ok
+def cBF(node):
+    if not node:
+        return None
 
+    hightL = 0
+    hightR = 0
+    
+    if node.leftnode:
+        hightL = node.leftnode.height + 1
+    if node.rightnode:
+        hightR = node.rightnode.height + 1
+
+    
+    if (node.balanceFactor != hightL - hightR):
+        print('HERE')
+    else:
+        cBF(node.leftnode)
+        cBF(node.rightnode)
+
+insert(tree, 1,1)
+insert(tree, 3,3)
+insert(tree, 2,2)
 printTree(tree.root, 0)
-print(tree.root.height)
+cBF(tree.root)
