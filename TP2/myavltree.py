@@ -1,8 +1,10 @@
-from mybinarytree import getNode, insertAux, searchAux, moveNode
+from mybinarytree import getNode, insertAux, searchAux, moveNode, search, access, update, traverseInPreOrder
 # Define classes
+
 
 class AVLTree:
     root = None
+
 
 class AVLNode:
     parent = None
@@ -13,7 +15,8 @@ class AVLNode:
     balanceFactor = None
     height = None
 
-# Define fn
+# Define functions
+
 
 def insert(avlTree, value, key):
     '''
@@ -37,11 +40,11 @@ def insert(avlTree, value, key):
     newNode.value = value
 
     # Insert node
-    if not avlTree.root: # Case if empty tree.
+    if not avlTree.root:  # Case if empty tree.
         avlTree.root = newNode
-    else: # General case
+    else:  # General case
         insertAux(avlTree.root, newNode)
-    
+
     # Update heights and bfs from the inserted node to the root
     updateHeight(newNode)
     updateBf(newNode, True)
@@ -51,6 +54,7 @@ def insert(avlTree, value, key):
 
     # Return key of inserted node
     return key
+
 
 def delete(avlTree, value):
     '''
@@ -71,24 +75,17 @@ def delete(avlTree, value):
     # Not found case
     if not nodeToDelete:
         return None
-    
-    #Only one node case
+
+    # Only one node case
     if not (avlTree.root.leftnode or avlTree.root.rightnode):
         avlTree.root = None
         return nodeToDelete.key
 
-    # Save original parent node of the deleted node
-    rebalanceNode = nodeToDelete.parent
-
-    # Delete using aux fn
-    deleteAux(avlTree, nodeToDelete)
-
-    ## Choose node to start re-balancing.
-    if not rebalanceNode: rebalanceNode = avlTree.root # Case root
+    # Delete using aux fn, and store the rebalanceNode
+    rebalanceNode = deleteAux(avlTree, nodeToDelete)
     if rebalanceNode.leftnode:
+        # rebalance node can be a un balanced parent
         rebalanceNode = rebalanceNode.leftnode
-    elif rebalanceNode.rightnode:
-        rebalanceNode = rebalanceNode.rightnode
 
     # Update heights and bfs from the rebalanceNode to the root
     updateHeight(rebalanceNode)
@@ -100,9 +97,52 @@ def delete(avlTree, value):
     # Return key
     return nodeToDelete.key
 
-def deleteAux(binaryTree, nodeToDelete):
+
+def deleteKey(avlTree, key):
+    '''
+    Explanation:
+        Delete an node with a given key on an AVL-Tree, keeps balanced.
+    Params:
+        avlTree: The tree on which you want to perform the delete.
+        key: The key of the node of the tree to be deleted.
+    Return:
+        The key of the deleted node.
+        Returns 'None' if there is no a node with the given key.
+    '''
+    # Search the node
+    nodeToDelete = getNode(avlTree, key)
+
+    # Not found case
+    if not nodeToDelete:
+        return None
+
+    # Only one node case
+    if not (avlTree.root.leftnode or avlTree.root.rightnode):
+        avlTree.root = None
+        return nodeToDelete.key
+
+    # Delete using aux fn, and store the rebalanceNode
+    rebalanceNode = deleteAux(avlTree, nodeToDelete)
+
+    # Update heights and bfs from the rebalanceNode to the root
+    updateHeight(rebalanceNode)
+    updateBf(rebalanceNode, True)
+
+    # Rebalance it from rebalanceNode
+    reBalance(avlTree, rebalanceNode)
+
+    # Return key
+    return nodeToDelete.key
+
+
+def deleteAux(avlTree, nodeToDelete):
+    # Store the pointer of the node to be used to rebalance, will be returned
+    rebalanceNode = None
+
+    # Deletetion algorithm
     # Case leaf node
     if not (nodeToDelete.leftnode or nodeToDelete.rightnode):
+        rebalanceNode = nodeToDelete.parent
         if nodeToDelete is nodeToDelete.parent.leftnode:
             nodeToDelete.parent.leftnode = None
         else:
@@ -110,11 +150,13 @@ def deleteAux(binaryTree, nodeToDelete):
 
     # Case right branch
     elif not nodeToDelete.leftnode:
-        moveNode(binaryTree, nodeToDelete.rightnode, nodeToDelete)
+        rebalanceNode = nodeToDelete.rightnode
+        moveNode(avlTree, nodeToDelete.rightnode, nodeToDelete)
 
     # Case left branch
     elif not nodeToDelete.rightnode:
-        moveNode(binaryTree, nodeToDelete.leftnode, nodeToDelete)
+        rebalanceNode = nodeToDelete.leftnode
+        moveNode(avlTree, nodeToDelete.leftnode, nodeToDelete)
 
     # Case both branchs
     else:
@@ -123,18 +165,31 @@ def deleteAux(binaryTree, nodeToDelete):
         while successorNode.leftnode:
             successorNode = successorNode.leftnode
 
+        # Define rebalance node
+        if successorNode.rightnode:
+            rebalanceNode = successorNode.rightnode
+        else:
+            rebalanceNode = successorNode.parent
+
         # Reasign pointers
         if successorNode.parent is nodeToDelete:
             if successorNode.rightnode:
                 successorNode.rightnode.parent = successorNode
         else:
-            moveNode(binaryTree, successorNode.rightnode, successorNode)
+            moveNode(avlTree, successorNode.rightnode, successorNode)
             successorNode.rightnode = nodeToDelete.rightnode
             if successorNode.rightnode:
                 successorNode.rightnode.parent = successorNode
-        moveNode(binaryTree, successorNode, nodeToDelete)
+        moveNode(avlTree, successorNode, nodeToDelete)
         successorNode.leftnode = nodeToDelete.leftnode
         successorNode.leftnode.parent = successorNode
+
+    # Return the rebalancer nodes
+    if rebalanceNode.leftnode:
+        # rebalance node can be an unbalanced parent
+        rebalanceNode = rebalanceNode.leftnode
+    return rebalanceNode
+
 
 def rotateLeft(avlTree, avlNode):
     '''
@@ -157,7 +212,7 @@ def rotateLeft(avlTree, avlNode):
         avlNode.rightnode.parent = avlNode
     else:
         avlNode.rightnode = None
-    
+
     # Change parents relationships betwen roots
     newRoot.parent = avlNode.parent
     if avlNode is avlTree.root:
@@ -177,6 +232,7 @@ def rotateLeft(avlTree, avlNode):
 
     # Return new root pointer
     return newRoot
+
 
 def rotateRight(avlTree, avlNode):
     '''
@@ -220,6 +276,7 @@ def rotateRight(avlTree, avlNode):
     # Return new root pointer
     return newRoot
 
+
 def updateBf(avlNode, recursive):
     '''
     Explanation:
@@ -230,11 +287,11 @@ def updateBf(avlNode, recursive):
     Info:
         This function DOESN'T UPDATE HEIGHTS, must be called updateHeight() first.
     '''
-    ## This recursive fn calcs and update the bf of avlNode, reading child's heights.
+    # This recursive fn calcs and update the bf of avlNode, reading child's heights.
     # Store the height of each child nodes, if exists
     hightL = 0
     hightR = 0
-    
+
     if avlNode.leftnode:
         hightL = avlNode.leftnode.height + 1
     if avlNode.rightnode:
@@ -246,6 +303,7 @@ def updateBf(avlNode, recursive):
     # Calc new bf of his parent, until root
     if recursive and avlNode.parent:
         updateBf(avlNode.parent, True)
+
 
 def updateHeight(avlNode):
     '''
@@ -260,16 +318,17 @@ def updateHeight(avlNode):
             avlNode.height = 1 + avlNode.leftnode.height
         else:
             avlNode.height = 1 + avlNode.rightnode.height
-    elif avlNode.leftnode: #Only left child node
+    elif avlNode.leftnode:  # Only left child node
         avlNode.height = 1 + avlNode.leftnode.height
-    elif avlNode.rightnode: # Only right child node
+    elif avlNode.rightnode:  # Only right child node
         avlNode.height = 1 + avlNode.rightnode.height
-    else: # Leaf node
+    else:  # Leaf node
         avlNode.height = 0
-    
+
     # Continue up if the avlNode isn't the tree's root
     if avlNode.parent:
         updateHeight(avlNode.parent)
+
 
 def reBalance(avlTree, avlNode):
     '''
@@ -283,89 +342,32 @@ def reBalance(avlTree, avlNode):
     '''
     # Case inexistent node
     if not avlNode:
-        return None 
-    
+        return None
+
     # Check if is necessary to rebalance the node (bf != -1,0,1)
-    if avlNode.balanceFactor < -1: # unbalanced to the right
-        if avlNode.rightnode.balanceFactor > 0: # the rChild have rSubChild
+    if avlNode.balanceFactor < -1:  # unbalanced to the right
+        if avlNode.rightnode.balanceFactor > 0:  # the rChild have rSubChild
             rotateRight(avlTree, avlNode.rightnode)
             rotateLeft(avlTree, avlNode)
-        else: # No rSubrChild
+        else:  # No rSubrChild
             rotateLeft(avlTree, avlNode)
-        
+
         # Update balanceFactor of parent's right node ONLY, and from avlNode recursively to root.
-        if avlNode.parent.rightnode: updateBf(avlNode.parent.rightnode, False)
+        if avlNode.parent.rightnode:
+            updateBf(avlNode.parent.rightnode, False)
         updateBf(avlNode, True)
 
-    elif avlNode.balanceFactor > 1: # unbalanced to the left
-        if avlNode.leftnode.balanceFactor < 0: # same reason
+    elif avlNode.balanceFactor > 1:  # unbalanced to the left
+        if avlNode.leftnode.balanceFactor < 0:  # same reason
             rotateLeft(avlTree, avlNode.leftnode)
             rotateRight(avlTree, avlNode)
         else:
             rotateRight(avlTree, avlNode)
-        
+
         # Update balanceFactor of parent's left node ONLY, and from avlNode recursively to root.
-        if avlNode.parent.leftnode: updateBf(avlNode.parent.leftnode, False)
+        if avlNode.parent.leftnode:
+            updateBf(avlNode.parent.leftnode, False)
         updateBf(avlNode, True)
     else:
         # Continue recursively until root
         reBalance(avlTree, avlNode.parent)
-
-#TEST
-
-COUNT = [10]
-def printTree(actualNode, space):
-    # Base case.
-    if not actualNode:
-        return None
-
-    # Increase distance between levels.
-    space += COUNT[0]
-
-    # Process right child first.
-    printTree(actualNode.rightnode, space)
-
-    # Print current node after space.
-    print()
-    for _ in range(COUNT[0], space):
-        print(end=" ")
-    print(actualNode.value)
-
-    # Process left child.
-    printTree(actualNode.leftnode, space)
-
-tree = AVLTree()
-import random
-
-for i in range(1,500):
-    f = random.randint(0,5000)
-    insert(tree, f,f)
-
-for i in range(1,100):
-    f = random.randint(0,5000)
-    if delete(tree, f): print(f'Deleted {f}')
-
-
-### Checks if bf arfe ok
-def cBF(node):
-    if not node:
-        return None
-
-    hightL = 0
-    hightR = 0
-    
-    if node.leftnode:
-        hightL = node.leftnode.height + 1
-    if node.rightnode:
-        hightR = node.rightnode.height + 1
-
-    
-    if (node.balanceFactor != hightL - hightR):
-        print(f'here at: {node.value}')
-    else:
-        cBF(node.leftnode)
-        cBF(node.rightnode)
-
-
-
-cBF(tree.root)
