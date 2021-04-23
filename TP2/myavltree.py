@@ -338,7 +338,8 @@ def reBalance(avlTree, avlNode):
         avlTree: The AVL-Tree to be balanced.
         avlNode: The first node to be checked and rebalanced if is needed.
     Info:
-        This function DOESN'T UPDATE BALANCE FACTORS, must be called updateBf() first.
+        This function DOESN'T UPDATE BALANCE FACTORS of given parameters, must be called updateBf() first.
+        Only will update balanceFactors if a rebalance was performed.
     '''
     # Case inexistent node
     if not avlNode:
