@@ -9,6 +9,7 @@ MrTree = bt.RBTree()
 for element in arreglo:
     MrTree.insert(element, element)
 
+MrTree.delete
 
 countR = 0
 countN = 0

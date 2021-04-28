@@ -214,6 +214,8 @@ def moveNode(binaryTree, fromNode, toNode):
     # Check si el nodo nuevo era nulo
     if fromNode:
         fromNode.parent = toNode.parent
+    else:
+        toNode.parent = None
 
 
 def getNode(binaryTree, key):
