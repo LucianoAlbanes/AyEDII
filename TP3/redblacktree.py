@@ -21,39 +21,55 @@ nilNode = RedBlackNode()
 # Define functions
 
 
-def insert(RBTree, value, key):
+def insert(RBTree, RBNode):
+    '''
+    Explanation:
+        Inserts an RBNode in a Red-Black Tree, fix violations.
+    Params:
+        RBTree: The Red-Black Tree on which you want to perform the Alt.
+        RBNode: The node to be inserted
+    Return:
+        The RBTree pointer with the inserted node.
+        'None' if exists another node with the same key.
+    '''
+    # Check if exists another node with same key, if not, proceed with insertion
+    if not getNode(RBTree, RBNode.key):
+        # Insert node
+        if not RBTree.root:  # Case if empty tree.
+            RBTree.root = RBNode
+        else:  # General case
+            insertAux(RBTree.root, RBNode)
+
+        # Fix RBTree inconssistences.
+        fixup(RBTree, RBNode)
+        return RBTree
+    else:
+        return None
+
+
+def insertAlt(RBTree, value, key):
     '''
     Explanation:
         Inserts an value with a given key in a Red-Black Tree, fix violations.
     Params:
-        RBTree: The Red-Black Tree on which you want to perform the insert.
-        value: The value to insert in the given binary tree.
-        key: The key of the node with the given value to insert.
+        RBTree: The Red-Black Tree on which you want to perform the Alt.
+        value: The value to Alt in the given binary tree.
+        key: The key of the node with the given value to Alt.
     Return:
         The key of the node of the inserted value.
-        Returns 'None' if the insert cannot be performed (Exists a node with same key).
+        Returns 'None' if the Alt cannot be performed (Exists a node with same key).
     '''
-    # Check if the key already exists.
-    if getNode(RBTree, key):
-        return None
-
     # Create the new node
     newNode = RedBlackNode()
     newNode.key = key
     newNode.red = True
     newNode.value = value
 
-    # Insert node
-    if not RBTree.root:  # Case if empty tree.
-        RBTree.root = newNode
-    else:  # General case
-        insertAux(RBTree.root, newNode)
-
-    # Fix RBTree inconssistences.
-    fixup(RBTree, newNode)
-
-    # Return key of inserted node
-    return key
+    # Call insert fn, will verify if exists key, and do the fixup
+    if insert(RBTree, newNode):  # Return if was performed successfully
+        return key
+    else:
+        return None
 
 
 def fixup(RBTree, RBNode):
@@ -176,7 +192,31 @@ def rotateRight(RBTree, RBNode):
     return newRoot
 
 
-def delete(RBTree, value):
+def delete(RBTree, RBNode):
+    '''FIX TODO
+    Explanation:
+        Delete an node from a Red-Black Tree, fix violations.
+    Params:
+        RBTree: The Red-Black Tree on which you want to perform the deleteValue.
+        value: The value of the node of the tree to be deleted.
+    Return:
+        The pointer of the tree.
+        Returns 'None' if the deletion can't be performed.
+    '''
+    if RBTree and RBNode:  # Check if parameters are valid.
+        # Only one node case
+        if not (RBTree.root.leftnode or RBTree.root.rightnode):
+            RBTree.root = None
+        else:  # General Case
+            deleteAux(RBTree, RBNode)
+            # Unlink nilNode from the tree
+            removeTempNode()
+        return RBTree
+    else:
+        return None
+
+
+def deleteValue(RBTree, value):
     '''
     Explanation:
         Delete an node with a given value on an Red-Black Tree, fix violations.
@@ -192,23 +232,11 @@ def delete(RBTree, value):
     # Search the value
     nodeToDelete = searchAux(RBTree.root, value)
 
-    # Not found case
-    if not nodeToDelete:
-        return None
-
-    # Only one node case
-    if not (RBTree.root.leftnode or RBTree.root.rightnode):
-        RBTree.root = None
+    # Call delete fn.
+    if delete(RBTree, nodeToDelete):
         return nodeToDelete.key
-
-    # Delete using aux fn
-    deleteAux(RBTree, nodeToDelete)
-
-    # Unlink nilNode from the tree
-    removeTempNode()
-
-    # Return key
-    return nodeToDelete.key
+    else:
+        return None
 
 
 def deleteKey(RBTree, key):
@@ -225,23 +253,11 @@ def deleteKey(RBTree, key):
     # Search the value
     nodeToDelete = getNode(RBTree, key)
 
-    # Not found case
-    if not nodeToDelete:
-        return None
-
-    # Only one node case
-    if not (RBTree.root.leftnode or RBTree.root.rightnode):
-        RBTree.root = None
+    # Call delete fn.
+    if delete(RBTree, nodeToDelete):
         return nodeToDelete.key
-
-    # Delete using aux fn
-    deleteAux(RBTree, nodeToDelete)
-
-    # Unlink nilNode from the tree
-    removeTempNode()
-
-    # Return key
-    return nodeToDelete.key
+    else:
+        return None
 
 
 def deleteAux(RBTree, RBNode):
