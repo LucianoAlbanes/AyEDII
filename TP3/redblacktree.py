@@ -193,7 +193,7 @@ def rotateRight(RBTree, RBNode):
 
 
 def delete(RBTree, RBNode):
-    '''FIX TODO
+    '''
     Explanation:
         Delete an node from a Red-Black Tree, fix violations.
     Params:

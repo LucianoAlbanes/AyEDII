@@ -94,16 +94,15 @@ def insertAux(actualNode, newNode):
             actualNode.leftnode = newNode
             newNode.parent = actualNode
         else:
-            return insertAux(actualNode.leftnode, newNode)
+            insertAux(actualNode.leftnode, newNode)
 
     # Right node case.
     if actualNode.key < newNode.key:
         if not actualNode.rightnode:
             actualNode.rightnode = newNode
             newNode.parent = actualNode
-            return
         else:
-            return insertAux(actualNode.rightnode, newNode)
+            insertAux(actualNode.rightnode, newNode)
 
 
 def delete(binaryTree, value):
