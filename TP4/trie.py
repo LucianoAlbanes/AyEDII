@@ -19,10 +19,13 @@ class TrieNode:
 
 def insert(trie, element):
     '''
-    Descripción: insert un elemento en T, siendo T un Trie.
-    Entrada: El Trie sobre la cual se quiere agregar el elemento (Trie) y
-    el valor del elemento (palabra) a agregar.
-    Salida: No hay salida definida
+    Explanation:
+        Inserts an element in a given trie.
+    Params:
+        trie: The trie on which you want to perform the insert.
+        element: The word to insert in the given trie.
+    Return:
+        Not defined.
     '''
     # Case not initialized tree
     if not trie.root:
@@ -30,7 +33,7 @@ def insert(trie, element):
         trie.root = TrieNode()
         trie.root.children = LL.LinkedList()
 
-    # Convert input element into a array
+    # Convert input element into an array.
     text = algo.String(element)
 
     # Comprare each level with each index of 'text'
@@ -64,10 +67,13 @@ def insert(trie, element):
 
 def search(trie, element):
     '''
-    Descripción: Verifica que un elemento se encuentre dentro del Trie
-    Entrada: El Trie sobre la cual se quiere buscar el elemento (Trie) y
-    el valor del elemento (palabra)
-    Salida: Devuelve False o True según se encuentre el elemento.
+    Explanation: 
+        Searches for an element in the given trie.
+    Params:
+        trie: The trie on which you want to perform the search.
+        element: The word to search in the given trie.
+    Return:
+        'True' if the element is in the given trie. Otherwise 'False'.
     '''
     # Convert input element into a array
     text = algo.String(element)
@@ -101,10 +107,14 @@ def search(trie, element):
 
 def delete(trie, element):
     '''
-    Descripción: Elimina un elemento se encuentre dentro del Trie
-    Entrada: El Trie sobre la cual se quiere eliminar el elemento (Trie)
-    y el valor del elemento (palabra) a eliminar.
-    Salida: Devuelve False o True según se haya eliminado el elemento.
+    Explanation:
+        Delete an element from a trie.
+    Params:
+        trie: The trie on which you want to perform the delete.
+        element: The word to delete in the given trie.
+    Return:
+        'True' if the deletion was successful.
+        'False' if the given element is not in the trie.
     '''
     # Convert input element into a array
     text = algo.String(element)
@@ -138,11 +148,14 @@ def delete(trie, element):
             while (currentLevel.parent.children.head.value is currentLevel and not currentLevel.parent.children.head.nextNode):
                 currentLevel.children = LL.LinkedList()
                 currentLevel = currentLevel.parent  # Case 2
+                if not currentLevel.parent:
+                    currentLevel.children = LL.LinkedList()  # Case empty tree (root)
+                    break
                 if currentLevel.isEndOfWord:  # Case 4
                     currentLevel.children = LL.LinkedList()
                     break
         # Return successfully deletion
         return True
 
-    else:  # Is not end of word
+    else:  # The word not exists in the trie, apears but without .isEndOfWord
         return False
