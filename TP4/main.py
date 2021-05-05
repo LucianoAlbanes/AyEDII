@@ -115,17 +115,22 @@ def checkEqualAux(trieNodeA, trieNodeB):
     # Check existence of each key on both LLists
     else:
         # Check actual level
-        actualNode = trieNodeA.children.head
-        while result and actualNode:
-            if checkKeyExistenceTrieNode(trieNodeB.children, actualNode.value.key) is None:
+        actualNodeA = trieNodeA.children.head
+        while result and actualNodeA:
+            actualNodeB = getNodeByKey(
+                trieNodeB.children, actualNodeA.value.key)
+            if actualNodeB is None:  # Check key existence
                 result = False
-            actualNode = actualNode.nextNode
+            # XOR .isEndOfWord
+            elif bool(actualNodeA.value.isEndOfWord) != bool(actualNodeB.value.isEndOfWord):
+                result = False
+            actualNodeA = actualNodeA.nextNode
 
         # Check deeper levels recursively
         actualNodeA = trieNodeA.children.head
         while result and actualNodeA:
-            actualNodeB = LL.getNode(trieNodeB.children, checkKeyExistenceTrieNode(
-                trieNodeB.children, actualNodeA.value.key))
+            actualNodeB = getNodeByKey(
+                trieNodeB.children, actualNodeA.value.key)
             result = (checkEqualAux(actualNodeA.value, actualNodeB.value))
             actualNodeA = actualNodeA.nextNode
 
@@ -133,7 +138,7 @@ def checkEqualAux(trieNodeA, trieNodeB):
     return result
 
 
-def checkKeyExistenceTrieNode(linkedList, key):
+def getNodeByKey(linkedList, key):
     """
     Explanation: 
         Searches for an key in a given linkedlist of TrieNodes.
@@ -152,7 +157,7 @@ def checkKeyExistenceTrieNode(linkedList, key):
     while actualNode:
         i += 1
         if actualNode.value.key == key:
-            return i
+            return actualNode
         actualNode = actualNode.nextNode
     return None
 
