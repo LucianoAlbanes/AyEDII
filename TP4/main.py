@@ -46,10 +46,8 @@ def searchPattern(trie, word, length):
     listOfWords = LL.LinkedList()
 
     # Navigate each child node recursively, use aux fn to check and store words.
-    while currentNode:
-        searchPatternAux(currentNode.value,
-                         (length-len(word)), listOfWords, length)
-        currentNode = currentNode.nextNode
+    searchPatternAux(currentNode.value,
+                     (length-len(word)), listOfWords, length)
 
     # Print each matched word
     listNode = listOfWords.head
