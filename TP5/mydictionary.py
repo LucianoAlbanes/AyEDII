@@ -8,7 +8,7 @@ class dictionaryNode:
     nextNode = None
 
 
-# Define global variables and dictionaries
+# Define global constants and dictionaries
 m = 10  # Length of the dictionary
 dictionary = algo1.Array(m, LL.LinkedList())
 
