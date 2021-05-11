@@ -1,7 +1,7 @@
-import algo1
-import linkedlist as LL
+from lib import algo1, linkedlist as LL
 
 # Def dictionaryNode (analog to linkedlist's node)
+
 class dictionaryNode:
     key = None
     value = None
@@ -9,92 +9,123 @@ class dictionaryNode:
 
 
 # Define global variables and dictionaries
-m = 10 # Length of the dictionary
-A = (1 - 5 ** .5) / 2 # Golden ratio φ
-dictionary = algo1.Array(m,LL.LinkedList())
+m = 10  # Length of the dictionary
+dictionary = algo1.Array(m, LL.LinkedList())
 
 # Define functions
 
 def h(key):
-    ''' Multiplication method | First, multiply the key by A (φ) and extract the fractional part of kA.
-    Then, multiply this value by m and take the floor of the result. '''
-    return int(m*(key*A % 1))
-
-def insert(D, key, value):
     '''
-    Descripción: Inserta un key en una posición determinada por la función
-    de hash similar a (1) en el diccionario (dictionary). Resolver
-    colisiones por encadenamiento. En caso de keys duplicados se anexan a
-    la lista.
-    Entrada: el diccionario sobre el cual se quiere realizar la inserción
-    y el valor del key a insertar
-    Salida: Devuelve D
+    Explanation:
+        Generates a hash for a given integer.
+    Info:
+        This hash function uses 'The division method' (key % m)
+        where (m) is the length of the dictionary.
+    Params:
+        key: The integer from which the hash is to be obtained.
+    '''
+    return (key % m)
+
+
+def insert(dictionary, key, value):
+    '''
+    Explanation:
+        Inserts a value in a dictionary (using hash tables).
+    Params:
+        dictionary: The dictionary on which you want to perform the insert.
+        key: The key of the value to be inserted.
+        value: The value to insert in the given dictionary.
+    Return:
+        The dictionary.
     '''
     # Obtain the hash of the given key
     index = h(key)
 
     # Create the LinkedList if the index is empty
-    if not D[index]:
-        D[index] = LL.LinkedList()
-    
+    if not dictionary[index]:
+        dictionary[index] = LL.LinkedList()
+
     # Create and add the new node to the list
-    add(D[index], key, value)
+    add(dictionary[index], key, value)
 
     # Return the dictionary.
-    return D
+    return dictionary
 
-def search(D, key):
+
+def search(dictionary, key):
     '''
-    Descripción: Busca un key en el diccionario
-    Entrada: El diccionario sobre el cual se quiere realizar la búsqueda
-    (dictionary) y el valor del key a buscar.
-    Salida: Devuelve el value de la key. Devuelve None si el key no se
-    encuentra.
+    Explanation:
+        Searches for a value in the given dictionary and key.
+    Params:
+        dictionary: The dictionary on which you want to perform the search.
+        key: The key of the value to be searched.
+    Return:
+        The value of element with the given key.
+        If the key do not exists in the dictionary, 'None' will be returned.
     '''
     # Obtain the hash of the given key
     index = h(key)
 
-    # If the index have a LList, search for key coincidences.
-    if D[index]:
-        actualNode = D[index].head
+    # Check if the index have a linked list to check if the key exists.
+    resultKey = None
+    if dictionary[index]:
+        actualNode = dictionary[index].head
         while actualNode:
             if actualNode.key is key:
-                return actualNode.value # Match case
+                resultKey = actualNode.value  # Match case
+                break
             actualNode = actualNode.nextNode
-    
-    # Case empty index or not found key
-    return False
+
+    # Return the resultKey
+    return resultKey
 
 
-def delete(D, key):
+def delete(dictionary, key):
     '''
-    Descripción: Elimina un key en la posición determinada por una función
-    de hash similar (1) del diccionario (dictionary)
-    Poscondición: Se debe marcar como nulo el key a eliminar.
+    Explanation:
+        Deletes a value with the given key from a dictionary.
+    Params:
+        dictionary: The dictionary on which you want to perform the deletion.
+        key: The key of the value to be deleted.
+    Return:
+        The value of the deleted key.
+        If the key do not exists in the dictionary, 'None' will be returned.
     '''
     # Obtain the hash of the given key
     index = h(key)
 
+    # Define a variable to store the value of the possible deleted value.
+    deletedValue = None
+
     # If the index have a LList, search for key coincidences.
-    if D[index]:
-        if D[index].head.key is key:  # Case head is node to delete
-            if not D[index].head.nextNode: # Unique node, unlink LList
-                D[index] = None
-            else: # Have other nodes
-                D[index].head = D[index].head.nextNode
-        else: # Key isn't head
-            actualNode = D[index].head
-            while actualNode.nextNode:
+    if dictionary[index]:
+        if dictionary[index].head.key is key:  # Case head is node to delete
+            deletedValue = dictionary[index].head.value  # Store the key
+            if not dictionary[index].head.nextNode:  # Unique node, unlink LList
+                dictionary[index] = None
+            else:  # Have other nodes
+                dictionary[index].head = dictionary[index].head.nextNode
+
+        else:  # Key isn't head
+            actualNode = dictionary[index].head
+            while actualNode.nextNode:  # Loop until key coincidence
                 if actualNode.nextNode.key is key:
+                    deletedValue = actualNode.nextNode.value  # Store the key
                     actualNode.nextNode = actualNode.nextNode.nextNode
                     break
                 actualNode = actualNode.nextNode
+
+    # Return the key if a node was deleted, otherwise None
+    return deletedValue
 
 
 def add(linkedList, key, value):
     '''
     Explanation: 
-        Add an element at the beginning of a LinkedList (sequence ADT).
+        Add an element at the beginning of a Linked List (sequence ADT).
+    Info:
+        This add function differs from the implementation of Linked list
+        because this function creates a dictionaryNode (which has as an addition a key value).
     Params:
         linkedList: The list on which you want to add the element.
         key: The key of the inserted node.
@@ -110,5 +141,3 @@ def add(linkedList, key, value):
 
     # Assign the new node as the first node
     linkedList.head = newNode
-
-
