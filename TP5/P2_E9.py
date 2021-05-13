@@ -2,7 +2,6 @@ from lib import algo1, linkedlist as LL
 
 # Def dictionaryNode (analog to linkedlist's node)
 
-
 class dictionaryNode:
     key = None
     value = None
@@ -13,6 +12,7 @@ class dictionaryNode:
 A = ((5**.5 - 1)/2)  # Golden ratio φ
 
 # Define functions
+
 
 def h(key):
     '''
@@ -50,34 +50,6 @@ def insert(dictionary, key, value):
 
     # Return the dictionary.
     return dictionary
-
-
-def search(dictionary, key):
-    '''
-    Explanation:
-        Searches for a value in the given dictionary and key.
-    Params:
-        dictionary: The dictionary on which you want to perform the search.
-        key: The key of the value to be searched.
-    Return:
-        The value of element with the given key.
-        If the key do not exists in the dictionary, 'None' will be returned.
-    '''
-    # Obtain the hash of the given key
-    index = h(key)
-
-    # Check if the index have a linked list to check if the key exists.
-    resultKey = None
-    if dictionary[index]:
-        actualNode = dictionary[index].head
-        while actualNode:
-            if actualNode.key is key:
-                resultKey = actualNode.value  # Match case
-                break
-            actualNode = actualNode.nextNode
-
-    # Return the resultKey
-    return resultKey
 
 
 def delete(dictionary, key):
@@ -142,31 +114,41 @@ def add(linkedList, key, value):
     # Assign the new node as the first node
     linkedList.head = newNode
 
+
 # Exercise specific implementation
 
-def hasUniqueElements(array):
+def verifySubset(set1, set2):
     '''
     Explanation: 
-        Check if the given array has uniques values.
+        Verify if set1 is a subset of set2.
     Params:
-        array: an array of integers to be checked.
+        set1: The subset
+        set2: The superset
     Return:
-        'True' is the array doesn't content repeated values
+        'True' is set1 is a subset of set2.
         'False' otherwise.
     '''
     # Define result variable
-    hasUniques = True
+    isSubset = False
 
-    # Create a temp dictionary to store the values
-    dictionary = algo1.Array(m, LL.LinkedList())
-    print('REad')
-    # Search for coincidences and break or insert each value of array in dictionary
-    for i in range(len(array)):
-        if search(dictionary, array[i]):
-            hasUniques = False
-            break
-        else:
-            insert(dictionary, array[i], array[i])
+    # set2 must be larger or equal to set1
+    if len(set1) > len(set2):
+        isSubset = False
 
-    # Return result of hasUnique
-    return hasUniques
+    else:  # Possible subset, compare using hash tables.
+        # Now, isSubset is true until proven otherwise.
+        isSubset = True
+
+        # Define a dictionary to store all the elements of set2
+        dictionary = algo1.Array(m, LL.LinkedList())
+        for i in range(len(set2)):
+            insert(dictionary, set2[i], set2[i])
+
+        # Check existence and delete of each character of set1 in the created dictionary
+        for i in range(len(set1)):
+            if not delete(dictionary, set1[i]):
+                isSubset = False
+                break  # When a discrepancy appears, break the loop.
+
+    # Return result
+    return isSubset

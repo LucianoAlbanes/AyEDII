@@ -8,23 +8,43 @@ class dictionaryNode:
     value = None
     nextNode = None
 
-
-# Define global constant
-A = ((5**.5 - 1)/2)  # Golden ratio φ
-
 # Define functions
+
 
 def h(key):
     '''
     Explanation:
-        Generates a hash for a given integer.
+        Get the position in the alphabet for a given character.
     Info:
-        This hash function uses 'The multiplication method'
-        where (m) is the length of the dictionary and A is φ.
+        This function is specific to letters from a-z and A-Z. (ϵ ñ,Ñ).
+        The dictionary length is 54 (27*2)
     Params:
-        key: The integer from which the hash is to be obtained.
+        key: The letter from which the hash is to be obtained.
+    Return:
+        An integer with the hash (position) of the given letter in the alphabet.
     '''
-    return int(m*(key*A % 1))
+    # Define dictionary length and result variable
+    result = None
+
+    # Store unicode value of key
+    if key == 'Ñ':
+        result = 14
+    elif key == 'ñ':
+        result = 41
+    else:
+        # Define result using 26 letter alphabet
+        result = ord(key) - ord('A')
+
+        # Fix to consider ñ in alphabet and other unicode characters
+        if result >= 14 and result <= 26:
+            result += 1
+        elif result > 26 and result <= 45:
+            result -= 5
+        elif result > 40:
+            result -= 4
+
+    # Return the position of the key in a 27 letter alphabet
+    return result
 
 
 def insert(dictionary, key, value):
@@ -50,34 +70,6 @@ def insert(dictionary, key, value):
 
     # Return the dictionary.
     return dictionary
-
-
-def search(dictionary, key):
-    '''
-    Explanation:
-        Searches for a value in the given dictionary and key.
-    Params:
-        dictionary: The dictionary on which you want to perform the search.
-        key: The key of the value to be searched.
-    Return:
-        The value of element with the given key.
-        If the key do not exists in the dictionary, 'None' will be returned.
-    '''
-    # Obtain the hash of the given key
-    index = h(key)
-
-    # Check if the index have a linked list to check if the key exists.
-    resultKey = None
-    if dictionary[index]:
-        actualNode = dictionary[index].head
-        while actualNode:
-            if actualNode.key is key:
-                resultKey = actualNode.value  # Match case
-                break
-            actualNode = actualNode.nextNode
-
-    # Return the resultKey
-    return resultKey
 
 
 def delete(dictionary, key):
@@ -142,31 +134,48 @@ def add(linkedList, key, value):
     # Assign the new node as the first node
     linkedList.head = newNode
 
-# Exercise specific implementation
 
-def hasUniqueElements(array):
+def zipString(string):
     '''
-    Explanation: 
-        Check if the given array has uniques values.
+    Explanation:
+        Compress a given string like the following pattern: 'aabcccccaaa' -> 'a2b1c5a3'.
+    Info:
+        If the result string is grater or equal to the given string, this last one will be returned.
     Params:
-        array: an array of integers to be checked.
+        string: The string to be compresed.
     Return:
-        'True' is the array doesn't content repeated values
-        'False' otherwise.
+        The compressed string or the input, as explained in 'Info'.
     '''
-    # Define result variable
-    hasUniques = True
-
-    # Create a temp dictionary to store the values
+    # Define length of dictionary and create one
+    m = 27*2  # Two alphabets, upper and lower case
     dictionary = algo1.Array(m, LL.LinkedList())
-    print('REad')
-    # Search for coincidences and break or insert each value of array in dictionary
-    for i in range(len(array)):
-        if search(dictionary, array[i]):
-            hasUniques = False
-            break
-        else:
-            insert(dictionary, array[i], array[i])
 
-    # Return result of hasUnique
-    return hasUniques
+    # Load values of the string in the dictionary:
+    # key: hash of the letter, value: times that appears.
+    # Will be added in inverse order, to mantain order and
+    # get better time performance when accessing at the linked list.
+    i = len(string)-1
+    while i >= 0:
+        actualLetter = string[i]
+        timesAppear = 1
+        while i > 0 and actualLetter == string[i-1]:
+            timesAppear += 1
+            i -= 1
+        insert(dictionary, actualLetter, timesAppear)
+        i -= 1
+
+    # Define a output string to store contatenating each letter with his
+    # respective value on the dictionary 'timesAppears', using delete().
+    outputString = ''
+    for i in range(0, len(string)):
+        if i == len(string)-1 or string[i] != string[i+1]:
+            outputString = (
+                outputString + string[i] + str(delete(dictionary, string[i])))
+
+    # If original input is shorter or equal to the result,
+    # overwrite the output string with the original one.
+    if len(string) <= len(outputString):
+        outputString = string
+
+    # Return the final output string
+    return outputString
