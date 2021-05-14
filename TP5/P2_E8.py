@@ -2,7 +2,7 @@ from lib import algo1
 
 # Define global constants
 A = ((5**.5 - 1)/2)  # Golden ratio φ
-m = 94  # Length of the dictionary (Basic latin, punctuation and symbols)
+m = 10**66  # (94**len(str2)) 94 is length of the dictionary (Basic latin, punctuation and symbols) , could be much smaller.
 
 # Define functions
 

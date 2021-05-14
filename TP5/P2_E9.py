@@ -12,8 +12,6 @@ class dictionaryNode:
 A = ((5**.5 - 1)/2)  # Golden ratio φ
 
 # Define functions
-
-
 def h(key):
     '''
     Explanation:
@@ -27,10 +25,12 @@ def h(key):
     return int(m*(key*A % 1))
 
 
-def insert(dictionary, key, value):
+def insertSet(dictionary, key, value):
     '''
     Explanation:
-        Inserts a value in a dictionary (using hash tables).
+        Inserts a value in a set dictionary (using hash tables).
+    Info:
+        Because the dictionary is a set, if the element already exists, won't be added.
     Params:
         dictionary: The dictionary on which you want to perform the insert.
         key: The key of the value to be inserted.
@@ -44,52 +44,13 @@ def insert(dictionary, key, value):
     # Create the LinkedList if the index is empty
     if not dictionary[index]:
         dictionary[index] = LL.LinkedList()
-
-    # Create and add the new node to the list
-    add(dictionary[index], key, value)
-
+    
+    if not LL.search(dictionary[index], value):
+        # If the value is not in the Llist, add it.
+        add(dictionary[index], key, value)
+   
     # Return the dictionary.
     return dictionary
-
-
-def delete(dictionary, key):
-    '''
-    Explanation:
-        Deletes a value with the given key from a dictionary.
-    Params:
-        dictionary: The dictionary on which you want to perform the deletion.
-        key: The key of the value to be deleted.
-    Return:
-        The value of the deleted key.
-        If the key do not exists in the dictionary, 'None' will be returned.
-    '''
-    # Obtain the hash of the given key
-    index = h(key)
-
-    # Define a variable to store the value of the possible deleted value.
-    deletedValue = None
-
-    # If the index have a LList, search for key coincidences.
-    if dictionary[index]:
-        if dictionary[index].head.key is key:  # Case head is node to delete
-            deletedValue = dictionary[index].head.value  # Store the key
-            if not dictionary[index].head.nextNode:  # Unique node, unlink LList
-                dictionary[index] = None
-            else:  # Have other nodes
-                dictionary[index].head = dictionary[index].head.nextNode
-
-        else:  # Key isn't head
-            actualNode = dictionary[index].head
-            while actualNode.nextNode:  # Loop until key coincidence
-                if actualNode.nextNode.key is key:
-                    deletedValue = actualNode.nextNode.value  # Store the key
-                    actualNode.nextNode = actualNode.nextNode.nextNode
-                    break
-                actualNode = actualNode.nextNode
-
-    # Return the key if a node was deleted, otherwise None
-    return deletedValue
-
 
 def add(linkedList, key, value):
     '''
@@ -114,6 +75,33 @@ def add(linkedList, key, value):
     # Assign the new node as the first node
     linkedList.head = newNode
 
+def search(dictionary, key):
+    '''
+    Explanation:
+        Searches for a value in the given dictionary and key.
+    Params:
+        dictionary: The dictionary on which you want to perform the search.
+        key: The key of the value to be searched.
+    Return:
+        The value of element with the given key.
+        If the key do not exists in the dictionary, 'None' will be returned.
+    '''
+    # Obtain the hash of the given key
+    index = h(key)
+
+    # Check if the index have a linked list to check if the key exists.
+    resultKey = None
+    if dictionary[index]:
+        actualNode = dictionary[index].head
+        while actualNode:
+            if actualNode.key is key:
+                resultKey = actualNode.value  # Match case
+                break
+            actualNode = actualNode.nextNode
+
+    # Return the resultKey
+    return resultKey
+
 
 # Exercise specific implementation
 
@@ -128,27 +116,22 @@ def verifySubset(set1, set2):
         'True' is set1 is a subset of set2.
         'False' otherwise.
     '''
-    # Define result variable
-    isSubset = False
+    # Define isSubset. Is true until proven that not.
+    isSubset = True
 
-    # set2 must be larger or equal to set1
-    if len(set1) > len(set2):
-        isSubset = False
+    # Define a dictionary to store all the elements of set2
+    dictionary = algo1.Array(m, LL.LinkedList())
+    for i in range(len(set2)):
+        insertSet(dictionary, set2[i], set2[i]) # Once each
 
-    else:  # Possible subset, compare using hash tables.
-        # Now, isSubset is true until proven otherwise.
-        isSubset = True
-
-        # Define a dictionary to store all the elements of set2
-        dictionary = algo1.Array(m, LL.LinkedList())
-        for i in range(len(set2)):
-            insert(dictionary, set2[i], set2[i])
-
-        # Check existence and delete of each character of set1 in the created dictionary
-        for i in range(len(set1)):
-            if not delete(dictionary, set1[i]):
-                isSubset = False
-                break  # When a discrepancy appears, break the loop.
+    # Check existence of each character of set1 in the created dictionary
+    for i in range(len(set1)):
+        if search(dictionary, set1[i]) is None:
+            # if that element doesn't exist in the dictionary, set1 isn't a subset
+            isSubset = False
+            break
 
     # Return result
     return isSubset
+
+m = 10**digits # 10^(average input digits). Could be smaller.
