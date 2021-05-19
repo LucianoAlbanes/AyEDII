@@ -31,6 +31,8 @@ def insert(dictionary, key, value):
     '''
     Explanation:
         Inserts a value in a dictionary (using hash tables).
+    Info:
+        If the key to insert is already in the table, the old value will be overwritten.
     Params:
         dictionary: The dictionary on which you want to perform the insert.
         key: The key of the value to be inserted.
@@ -45,8 +47,17 @@ def insert(dictionary, key, value):
     if not dictionary[index]:
         dictionary[index] = LL.LinkedList()
 
-    # Create and add the new node to the list
-    add(dictionary[index], key, value)
+        # Add the new node to the list
+        add(dictionary[index], key, value)
+
+    else:
+        # Verify is the key already exists
+        matchNode = getNodeByKey(dictionary[index], key)
+        if matchNode:
+            matchNode.value = value  # Overwrite value
+        else:
+            # Add a new node
+            add(dictionary[index], key, value)
 
     # Return the dictionary.
     return dictionary
@@ -67,17 +78,14 @@ def search(dictionary, key):
     index = h(key)
 
     # Check if the index have a linked list to check if the key exists.
-    resultKey = None
+    resultValue = None
     if dictionary[index]:
-        actualNode = dictionary[index].head
-        while actualNode:
-            if actualNode.key is key:
-                resultKey = actualNode.value  # Match case
-                break
-            actualNode = actualNode.nextNode
+        resultNode = getNodeByKey(dictionary[index], key)
+        if resultNode:  # Because exist, overwrite the resultValue variable.
+            resultValue = resultNode.value
 
-    # Return the resultKey
-    return resultKey
+    # Return the resultValue
+    return resultValue
 
 
 def delete(dictionary, key):
@@ -141,3 +149,29 @@ def add(linkedList, key, value):
 
     # Assign the new node as the first node
     linkedList.head = newNode
+
+
+def getNodeByKey(linkedList, key):
+    '''
+    Explanation: 
+        Searches for a key in a given linkedlist of dictionaryNodes.
+    Params:
+        linkedList: The list on which you want to perform the operation.
+        key: The key to search in the given list.
+    Return:
+        The pointer of the node.
+        Returns 'None' if there is not a node with the given key.
+    '''
+    # Define a result variable to store the pointer if exists.
+    pointer = None
+
+    # Search until a key coincidence
+    actualNode = linkedList.head
+    while actualNode:
+        if actualNode.key is key:
+            pointer = actualNode  # Store the pointer
+            break
+        actualNode = actualNode.nextNode
+
+    # Return the result value
+    return pointer
