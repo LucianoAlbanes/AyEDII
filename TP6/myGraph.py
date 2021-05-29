@@ -2,6 +2,7 @@
 from lib import algo1 as ALGO
 from lib import linkedlist as LL
 from lib import myqueue as Q
+from lib import tree as TREE
 from lib.hashLinear import hashLinear as hashG
 
 
@@ -26,6 +27,13 @@ def createGraph(vertexList, edgeList):
     # Creates a graph object as an array of the size of vertexList
     graph = ALGO.Array(LL.length(vertexList), Vertex())
 
+    # Initialize each vertex
+    actualVertex = vertexList.head
+    while actualVertex:
+        graph[hashG(actualVertex.value, graph)
+              ] = createVertex(actualVertex.value)
+        actualVertex = actualVertex.nextNode
+
     # Add each edge (pair of elements of edgeList) in the graph
     edgeNode = edgeList.head
     while edgeNode:
@@ -33,16 +41,9 @@ def createGraph(vertexList, edgeList):
         key1 = edgeNode.value
         key2 = edgeNode.nextNode.value
 
-        # Check if each vertex already exists, otherwise, create it.
+        # Get each vertex
         vertex1 = graph[hashG(key1, graph)]
-        if not vertex1:
-            vertex1 = createVertex(key1)
-            graph[hashG(vertex1.key, graph)] = vertex1
-
         vertex2 = graph[hashG(key2, graph)]
-        if not vertex2:
-            vertex2 = createVertex(key2)
-            graph[hashG(vertex2.key, graph)] = vertex2
 
         # Adds each vertex as a neighbor of the other
         LL.add(vertex1.neighborsList, vertex2)
@@ -72,16 +73,12 @@ def existPath(graph, vertex1Key, vertex2Key):
     # An additional list will be created to store each discovered node, to clear temps.
     discovered = Q.Queue()
 
-    # Searches for the index of each vertex, can be None (not exists in the graph)
-    vertex1Index = hashG(vertex1Key, graph)
-    vertex2Index = hashG(vertex2Key, graph)
+    # Get pointers of the vertexes
+    vertex1 = graph[hashG(vertex1Key, graph)]
+    vertex2 = graph[hashG(vertex2Key, graph)]
 
     # Check existence of the two vertexes after check for a path
-    if (vertex1Index != None and vertex2Index != None) and (graph[vertex1Index] and graph[vertex2Index]):
-        # Get pointers of the vertexes
-        vertex1 = graph[vertex1Index]
-        vertex2 = graph[vertex2Index]
-
+    if (vertex1 and vertex2):
         # Define the queue, set vertex1 as gray (BFS like)
         # ! Usage of temp attribute = None:WHITE, 0:GRAY, 1:BLACK
         queue = Q.Queue()
@@ -228,6 +225,200 @@ def isTree(graph):
     return isTree and (discoveredQuantity == len(graph))
 
 
+def countConnections(graph):
+    '''
+    Explanation: 
+        Finds and return the number of collections in the given graph
+    Params:
+        graph: The graph (Adjacency list) to be checked.
+    Return:
+        An integer representing how many collection exists.
+    '''
+    # Define a variable to store the numbers of collections, will increase
+    collections = 0
+
+    # Check for a empty graph, proceed otherwise
+    if graph[0]:
+        # Checks all the vertexes of the graph, when a uncolores graph apears, do bfs.
+        for i in range(len(graph)):
+            if graph[i].temp == None:
+                # An uncolored vertex apears. It's part of a new collection.
+                collections += 1
+                bfs(graph[i])
+
+    # Clear all temps
+    for i in range(len(graph)):
+        graph[i].temp = None
+
+    # Return the number of collections
+    return collections
+
+
+def convertToTree(graph, vertexKey):
+    '''
+    Explanation: 
+        Convert a given graph into a tree.
+    Info:
+        This function modify the original graph and return the tree version.
+        Be carefull.
+    Params:
+        graph: The graph (Adjacency list) to be converted.
+        vertexKey: The vertex to be assigned as root of the tree.
+    Return:
+        The same graph (Adjacency list), but as a tree.
+    '''
+    # Find the root vertex
+    rootVertex = graph[hashG(vertexKey, graph)]
+
+    # Define the queue, set rootVertex as gray (BFS like)
+    # ! Usage of temp attribute = None:WHITE, 0:GRAY, 1:BLACK
+    queue = Q.Queue()
+    rootVertex.temp = 0
+    Q.enqueue(queue, (rootVertex, None))  # Tuple, vertex and his parent
+
+    # Search until empty queue
+    while queue.tail:
+        # Extract the actual vertex
+        actualVertex, actualVertexParent = Q.dequeue(
+            queue)  # Dequeue the tuple
+
+        # Discover new vertexes, set they as gray, and check if a cycle apears
+        actualNeighbor = actualVertex.neighborsList.head
+        while actualNeighbor:
+            if actualNeighbor.value.temp == None:
+                # New vertex, change to gray and enqueue
+                actualNeighbor.value.temp = 0
+
+                # Enqueue with his parent vertex
+                Q.enqueue(queue, (actualNeighbor.value, actualVertex))
+            else:
+                if not (actualNeighbor.value is actualVertexParent):
+                    # A cycle apears!, actualNeighbor was discovered previously.
+                    # Remove the cycle from the two vertexes
+                    # (The temporal complexity of this removals isn't constant,...
+                    # ...depends on the size of the neighbors linked list.)
+                    LL.delete(actualNeighbor.value.neighborsList, actualVertex)
+                    LL.delete(actualVertex.neighborsList, actualNeighbor.value)
+
+            # Continue with the next neighbor
+            actualNeighbor = actualNeighbor.nextNode
+
+        # Set actual vertex to Black
+        actualVertex.temp = 1
+
+    # Remove undiscovered vertexes and clear temps
+    for i in range(len(graph)):
+        if graph[i].temp != None:
+            graph[i].temp = None
+        else:
+            graph[i] = None
+    
+    # Return the modified graph
+    return graph
+
+
+def convertToTreeStructure(graph, vertexKey):
+    '''
+    Explanation: 
+        Create a tree structure from the given parameters.
+    Info:
+        This function doesn't modify the original graph, creates a new structure.
+        See the implementation of tree (lib.tree)
+    Params:
+        graph: The graph (Adjacency list) where are the vertexes.
+        vertexKey: The vertex to be assigned as root of the tree
+    Return:
+        A new tree structure, generated from the given parameters.
+
+    !!! Si hubiese prestado atención a la consigna:
+        (Salida: Devuelve una Lista de Adyacencia con la representación
+        del árbol resultante.),
+        esta funcion no habria sido implementada :)
+    '''
+    # Get pointer of the vertex with given key
+    rootVertex = graph[hashG(vertexKey, graph)]
+
+    # Creates the new tree, with the given vertex as root
+    tree = TREE.Tree()
+    tree.root = TREE.createNode(rootVertex.key, None)
+
+    # Define the queue, set given vertex as gray (BFS like)
+    # ! Usage of temp (Tuple):
+    #   [0]: Color of BFS = None:WHITE, 0:GRAY, 1:BLACK
+    #   [1]: Vertex's node pointer in the tree
+    queue = Q.Queue()
+    rootVertex.temp = (0, tree.root)
+    Q.enqueue(queue, rootVertex)
+
+    # An additional queue will be used to store all the discovered nodes, to lately clean theirs temps values
+    discovered = Q.Queue()
+    Q.enqueue(discovered, rootVertex)
+
+    # Discover all the graph
+    while queue.tail:
+        # Extract the actual vertex and his pointer in the tree
+        actualVertex = Q.dequeue(queue)
+        (_, actualVertexInTree) = actualVertex.temp
+
+        # Discover new vertexes, set they as gray, and add to the discovered list
+        actualNeighbor = actualVertex.neighborsList.head
+        while actualNeighbor:
+            if actualNeighbor.value.temp == None:
+                # Add this new node as children of his parent in the tree
+                newNode = TREE.createNode(
+                    actualNeighbor.value.key, actualVertexInTree)
+
+                # New vertex discover, change to gray and enqueue
+                # Store the reference in tree
+                actualNeighbor.value.temp = (0, newNode)
+                Q.enqueue(queue, actualNeighbor.value)
+
+                # Store in discovered
+                Q.enqueue(discovered, actualNeighbor.value)
+
+            # Continue with the next neighbor
+            actualNeighbor = actualNeighbor.nextNode
+
+        # Set actual vertex to Black
+        actualVertex.temp = 1
+
+    # Clean temps
+    clearTemp(discovered)
+
+    # Return the generated tree
+    return tree
+
+
+def bfs(vertex):
+    '''
+    Discover all nodes of a graph from the given vertex, will update temp attribute.
+    '''
+    # Define the queue, set given vertex as gray (BFS like)
+    # ! Usage of temp attribute = None:WHITE, 0:GRAY, 1:BLACK
+    queue = Q.Queue()
+    vertex.temp = 0
+    Q.enqueue(queue, vertex)
+
+    # Discover all the graph
+    while queue.tail:
+        # Extract the actual vertex
+        actualVertex = Q.dequeue(queue)
+
+        # Discover new vertexes, set they as gray, and add to the discovered list
+        actualNeighbor = actualVertex.neighborsList.head
+        while actualNeighbor:
+            if actualNeighbor.value.temp == None:
+                # New vertex discover, change to gray and enqueue
+                actualNeighbor.value.temp = 0
+                Q.enqueue(queue, actualNeighbor.value)
+
+            # Continue with the next neighbor
+            actualNeighbor = actualNeighbor.nextNode
+
+        # Set actual vertex to Black
+        actualVertex.temp = 1
+
+
 def createVertex(key):
     '''
     Explanation: 
@@ -276,8 +467,8 @@ def printGraphAdjList(graph):
 
 # Creates a simple graph using an adjacency list
 
-vertex =  [1, 3, 4, 5, 6, 8, 9, 12]
-edges =  [4, 5, 6, 3, 1, 8, 9, 12, 1, 3]
+vertex = [1, 3, 4, 5, 6, 8, 9, 12]
+edges = [4, 5, 6, 3, 1, 8, 9, 12, 1, 3]
 
 
 vertexList = LL.LinkedList()
@@ -292,4 +483,5 @@ for element in edges:
 graph = createGraph(vertexList, edgesList)
 print('Graph ready')
 
+tree = convertToTree(graph, 1)
 printGraphAdjList(graph)
