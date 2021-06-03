@@ -158,25 +158,25 @@ def makeTree(graph):
         A new graph, with the same vertexes but as an minimun spanning tree.
         If the given graph is not conencted or exists a edge with weight != 1, will return 'None'. 
     '''
-    # Create three LList with the edges and weights of the MST
+    # Create three LList with the vertexes, edges and weights of the MST
     mstVertexes = LL.LinkedList()
     mstEdges = LL.LinkedList()
     mstWeights = LL.LinkedList()
 
-    # Define the queue, set graph[0] as gray (BFS like)
+    # Define the queue, set graph[0] as discovered (BFS like)
     # ! Usage of temp attribute = True if vertex was discovered
     queue = Q.Queue()
     graph[0].temp = True
-    Q.enqueue(queue, 0)  # Tuple, vertex and his parent
+    Q.enqueue(queue, 0)
     LL.add(mstVertexes, graph[0].key)
 
     # Search until empty queue
-    RWeightFlag = True
+    RWeightFlag = True  # To verify the restriction weight = 1
     while RWeightFlag and queue.tail:
         # Extract the actual vertex index
-        actualVertexIndex = Q.dequeue(queue)  # Dequeue the tuple
+        actualVertexIndex = Q.dequeue(queue)
 
-        # Discover new vertexes, set they as discovered, and check weight = 1
+        # Discover new vertexes, set they as discovered, and check if weight = 1
         for i in range(len(graph)):
             actualWeight = graph[actualVertexIndex].data[i]
             if actualWeight == 1 and not graph[i].temp:
@@ -199,7 +199,7 @@ def makeTree(graph):
                     f'This graph does not satisfy M[u,v]=1 if (u,v)∈A | M[{graph[i].key}, {graph[actualVertexIndex].key}]={actualWeight}')
                 break
 
-    # Clear temps and store the quantity of discovered vertexes
+    # Clear temps and store the quantity of cleared (and discovered) vertexes
     qDiscoveredVertexes = clearTemp(graph, mstVertexes)
 
     # Verify if the graph is connected and make the new MST Graph
@@ -207,7 +207,7 @@ def makeTree(graph):
     if RWeightFlag and qDiscoveredVertexes == len(graph):
         mstGraph = createGraph(mstVertexes, mstEdges, mstWeights)
 
-    # Return the modified graph
+    # Return the new graph
     return mstGraph
 
 
