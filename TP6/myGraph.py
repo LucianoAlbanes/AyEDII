@@ -239,7 +239,7 @@ def countConnections(graph):
 
     # Check for a empty graph, proceed otherwise
     if graph[0]:
-        # Checks all the vertexes of the graph, when a uncolores graph apears, do bfs.
+        # Checks all the vertexes of the graph, when a uncolored vertex apears, do bfs.
         for i in range(len(graph)):
             if graph[i].temp == None:
                 # An uncolored vertex apears. It's part of a new collection.
