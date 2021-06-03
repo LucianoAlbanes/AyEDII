@@ -164,9 +164,9 @@ def makeTree(graph):
     mstWeights = LL.LinkedList()
 
     # Define the queue, set graph[0] as gray (BFS like)
-    # ! Usage of temp attribute = None:WHITE, 0:GRAY, 1:BLACK
+    # ! Usage of temp attribute = True if vertex was discovered
     queue = Q.Queue()
-    graph[0].temp = 0
+    graph[0].temp = True
     Q.enqueue(queue, 0)  # Tuple, vertex and his parent
     LL.add(mstVertexes, graph[0].key)
 
@@ -176,12 +176,12 @@ def makeTree(graph):
         # Extract the actual vertex index
         actualVertexIndex = Q.dequeue(queue)  # Dequeue the tuple
 
-        # Discover new vertexes, set they as gray, and check weight = 1
+        # Discover new vertexes, set they as discovered, and check weight = 1
         for i in range(len(graph)):
             actualWeight = graph[actualVertexIndex].data[i]
-            if actualWeight == 1 and graph[i].temp == None:
-                # New vertex, change to gray and enqueue
-                graph[i].temp = 0
+            if actualWeight == 1 and not graph[i].temp:
+                # New vertex, change to discovered and enqueue
+                graph[i].temp = True
 
                 # Enqueue
                 Q.enqueue(queue, i)
@@ -198,9 +198,6 @@ def makeTree(graph):
                 print(
                     f'This graph does not satisfy M[u,v]=1 if (u,v)∈A | M[{graph[i].key}, {graph[actualVertexIndex].key}]={actualWeight}')
                 break
-
-        # Set actual vertex to Black
-        graph[actualVertexIndex].temp = 1
 
     # Clear temps and store the quantity of discovered vertexes
     qDiscoveredVertexes = clearTemp(graph, mstVertexes)
