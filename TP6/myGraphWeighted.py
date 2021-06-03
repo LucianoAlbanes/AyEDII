@@ -1,7 +1,7 @@
 # Weighted Graph (Adjacency matrix) implementation
-from lib.tree import Tree
 from lib import algo1 as ALGO
 from lib import linkedlist as LL
+from lib import myqueue as Q
 from lib.hashLinear import hashLinear as hashG
 
 
@@ -16,7 +16,7 @@ def createGraph(vertexList, edgeList, weightList):
     Explanation: 
         Creates a graph from a given lists of vertex and edges.
     Info:
-        Returns a simple graph, as a adjacency matrix.
+        Returns a weighted graph, as a adjacency matrix.
     Params:
         vertexList: A linked list that contains the vertexes of the graph.
         edgeList: A linked list with the edges of each pair of vertex.
@@ -70,7 +70,15 @@ def createVertex(key, lengthOfArray):
 
 
 def primMST(graph):
-    # minimum spanning tree (MST)
+    '''
+    Explanation: 
+        Creates an minimun spanning tree from a graph.
+    Params:
+        graph: The graph (Adjacency matrix) to be used to create the MST.
+    Return:
+        A new graph, with the same vertexes but as an minimun spanning tree.
+        If the given graph is not conencted, will return 'None'.
+    '''
     # Select an arbitrary vertex as root, add it into a LList of discovered vertexes.
     # Each vertex in that list was discovered and is part of the spanning tree (|U| set s/ CLRS).
     # To improve time efficiency, a temp attribute will be used in each vertex to mark it as discovered or not.
@@ -93,13 +101,14 @@ def primMST(graph):
         actualVertex = discovered.head
         while actualVertex:
             for i in range(len(graph)):
-                actualWeight = actualVertex.value.data[i]
-                # graph[i].temp to verify that vertex has not been discovered.
-                if actualWeight and (minWeight is None or minWeight > actualWeight) and not graph[i].temp:
-                    # Apears an edge with less weight.
-                    minWeight = actualWeight
-                    vertex1Key = actualVertex.value.key
-                    vertex2Key = graph[i].key
+                # verify that actualVertex has not been discovered.
+                if not graph[i].temp:
+                    actualWeight = actualVertex.value.data[i]
+                    if actualWeight and (minWeight is None or minWeight > actualWeight):
+                        # Apears an edge with less weight.
+                        minWeight = actualWeight
+                        vertex1Key = actualVertex.value.key
+                        vertex2Key = graph[i].key
             actualVertex = actualVertex.nextNode
 
         # Verify if a new edge was discovered, else the graph is not connected
@@ -107,7 +116,7 @@ def primMST(graph):
             print('This graph is not connected. Make a MST is not possible.')
             break
 
-        # Set the new edge as discovered, increment discoverdN, and add it as mstEdges
+        # Set the new edge as discovered, increment discoverdN, and add it to the lists to make a mstGraph.
         graph[vertex2Key].temp = True
         discoveredN += 1
         LL.add(discovered, graph[vertex2Key])
@@ -131,8 +140,77 @@ def primMST(graph):
     while actualNode:
         actualNode.value.temp = None
         actualNode = actualNode.nextNode
-    
+
     # Return the MST
+    return mstGraph
+
+
+def makeTree(graph):
+    '''
+    Explanation: 
+        Creates a MST from a given graph.
+    Info:
+        This function is restricted to work with vertexes of weight = 1.
+        Will discover the tree using BFS.
+    Params:
+        graph: The graph (Adjacency matrix) to be used.
+    Return:
+        A new graph, with the same vertexes but as an minimun spanning tree.
+        If the given graph is not conencted or exists a edge with weight != 1, will return 'None'. 
+    '''
+    # Create three LList with the edges and weights of the MST
+    mstVertexes = LL.LinkedList()
+    mstEdges = LL.LinkedList()
+    mstWeights = LL.LinkedList()
+
+    # Define the queue, set graph[0] as gray (BFS like)
+    # ! Usage of temp attribute = None:WHITE, 0:GRAY, 1:BLACK
+    queue = Q.Queue()
+    graph[0].temp = 0
+    Q.enqueue(queue, 0)  # Tuple, vertex and his parent
+    LL.add(mstVertexes, graph[0].key)
+
+    # Search until empty queue
+    RWeightFlag = True
+    while RWeightFlag and queue.tail:
+        # Extract the actual vertex index
+        actualVertexIndex = Q.dequeue(queue)  # Dequeue the tuple
+
+        # Discover new vertexes, set they as gray, and check weight = 1
+        for i in range(len(graph)):
+            actualWeight = graph[actualVertexIndex].data[i]
+            if actualWeight == 1 and graph[i].temp == None:
+                # New vertex, change to gray and enqueue
+                graph[i].temp = 0
+
+                # Enqueue
+                Q.enqueue(queue, i)
+
+                # Add this pair of vertexes to the MST lists
+                LL.add(mstVertexes, graph[i].key)
+                LL.add(mstEdges, graph[i].key)
+                LL.add(mstEdges, graph[actualVertexIndex].key)
+                LL.add(mstWeights, actualWeight)
+
+            elif actualWeight and actualWeight != 1:
+                # Check restriction, M[u,v]=1 if (u,v)∈ A
+                RWeightFlag = False
+                print(
+                    f'This graph does not satisfy M[u,v]=1 if (u,v)∈A | M[{graph[i].key}, {graph[actualVertexIndex].key}]={actualWeight}')
+                break
+
+        # Set actual vertex to Black
+        graph[actualVertexIndex].temp = 1
+
+    # Clear temps and store the quantity of discovered vertexes
+    qDiscoveredVertexes = clearTemp(graph, mstVertexes)
+
+    # Verify if the graph is connected and make the new MST Graph
+    mstGraph = None
+    if RWeightFlag and qDiscoveredVertexes == len(graph):
+        mstGraph = createGraph(mstVertexes, mstEdges, mstWeights)
+
+    # Return the modified graph
     return mstGraph
 
 
@@ -166,19 +244,35 @@ def printGraphAdjMatrix(graph):
             print(f'{replaceNone(graph[i].data[len(graph)-1])}]')
 
 
+def clearTemp(graph, listOfVertexes):
+    '''
+    Explanation:
+        Receives a list of vertexes index and a graph, clears its temp value and returns the number of vertexes cleared.
+    '''
+    count = 0
+    actualVertex = listOfVertexes.head
+    while actualVertex:
+        graph[hashG(actualVertex.value, graph)].temp = None
+        actualVertex = actualVertex.nextNode
+        count += 1
+    return count
+
+
 ###################################################
 '''Test code'''
 
 
 # Creates a weighted graph as a adjacency matrix
-# The following graph was extracted from Gaby's video (https://ibb.co/261MmYK)
+# The following graph was extracted from the slides of ”Árboles Abarcadores” (https://ibb.co/261MmYK)
 vertex = [1, 2, 3, 4, 5, 6]
 edges = [1, 4, 1, 2, 1, 3, 2, 3, 4, 3, 3, 5, 3, 6, 5, 6, 2, 5, 4, 6]
 weights = [5, 6, 1, 5, 5, 6, 4, 6, 3, 2]
+weights2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
 vertexList = LL.LinkedList()
 edgesList = LL.LinkedList()
 weightsList = LL.LinkedList()
+weights2List = LL.LinkedList()
 
 for element in vertex:
     LL.add(vertexList, element)
@@ -188,6 +282,8 @@ for element in edges:
 
 for element in weights:
     LL.add(weightsList, element)
+for element in weights2:
+    LL.add(weights2List, element)
 
 # Create graph
 graph = createGraph(vertexList, edgesList, weightsList)
@@ -196,3 +292,8 @@ printGraphAdjMatrix(graph)
 
 print('\n\nGraph MST\n')
 printGraphAdjMatrix(primMST(graph))
+
+# Create another graph, but with 1 as weights
+print('\n\nGraph MST (Weight = 1)\n')
+graph2 = createGraph(vertexList, edgesList, weights2List)
+printGraphAdjMatrix(makeTree(graph2))

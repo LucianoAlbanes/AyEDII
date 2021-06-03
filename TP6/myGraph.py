@@ -436,7 +436,7 @@ def createVertex(key):
 def clearTemp(listOfVertexes):
     '''
     Explanation:
-        Receives a list of vertexes, clears its temp value and returns the number of vertices cleared.
+        Receives a list of vertexes, clears its temp value and returns the number of vertexes cleared.
     '''
     count = 0
     while listOfVertexes.tail:
