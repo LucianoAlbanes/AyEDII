@@ -390,7 +390,9 @@ if __name__ == "__main__":
     print(isContained(text8a, text8c))
     print(isContained(text8b, text8c))
 
-    text9a = String('cabccbacbacab')
+    text9aa = String('cabccbacbacab')
+    text9ab = String('cabccbacba cab')
     text9b = String('ab*ba*c')
     text9c = String('*')
-    print(isPatternContained(text9a, text9b, text9c))
+    print(isPatternContained(text9aa, text9b, text9c))
+    print(isPatternContained(text9ab, text9b, text9c))
