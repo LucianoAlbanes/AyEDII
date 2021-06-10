@@ -310,14 +310,14 @@ def isPatternContained(string, patternString, wildcard):
         If there is not left characters, will return 'None'.
         This 'None' is equivalent to say that the pattern was found in the string.
         '''
-        if patternIndex < len(patternString): 
+        if patternIndex < len(patternString):
             while strcmp(patternString[patternIndex], wildcard):
                 if patternIndex+1 < len(patternString):
                     patternIndex += 1
                 else:
                     patternIndex = None  # All patterns found.
                     break
-        else: # Overflow, pattern was entirely explored
+        else:  # Overflow, pattern was entirely explored
             patternIndex = None
         return patternIndex
 
@@ -330,14 +330,15 @@ def isPatternContained(string, patternString, wildcard):
     patternIndex = skipWildcards(patternIndex, patternString)
 
     # Search using Naive like algorithm
-    if patternIndex != None: # Empty or pattern of only wildcards
+    if patternIndex != None:  # Empty or pattern of only wildcards
         while not contained and stringIndex < len(string):
             current = 0
             while (stringIndex+current) < len(string) and strcmp(patternString[patternIndex+current], string[stringIndex+current]):
                 # Match character found!. Increment current and verify if it's a end of pattern
                 current += 1
 
-                nextPatternIndex = skipWildcards((patternIndex+current), patternString)
+                nextPatternIndex = skipWildcards(
+                    (patternIndex+current), patternString)
                 if nextPatternIndex == None:
                     # All patterns found!
                     contained = True
@@ -353,7 +354,7 @@ def isPatternContained(string, patternString, wildcard):
     else:
         # No need to verify, it's True
         contained = True
-    
+
     # Return the final result
     return contained
 
