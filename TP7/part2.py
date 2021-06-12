@@ -1,19 +1,84 @@
 # Implementation of patter matching exercises
 # Part 2 of Pattern Matching
 from lib.algo1 import *
+from lib.strcmpAlt import *
 from lib import linkedlist as LL
 from lib.hashLinear import hashLinear as h
 
 
 # Rabin Karp
 
+def RK_matcher(string, pattern):
+    '''
+    Explanation: 
+        Searchs if the pattern is contained on string.
+    Params:
+        string: The string where will be searched the occurrence of pattern.
+        pattern: The pattern (string) to be searched.
+    Return:
+        An integer with the position where the pattern starts inside the string.
+        'None' if was not found.
+    '''
+    # Define a variable to store the return of this function (index where apears)
+    result = None
+
+    # Store lengths of both strings
+    lengthS = len(string)
+    lengthP = len(pattern)
+
+    # Check case same length, no need to search, only compare
+    if lengthS == lengthP:
+        if strcmp(string, pattern):
+            result = 0
+
+    # Check requisites for general case
+    elif not (strcmpAlt(pattern, String('')) or lengthP > lengthS):
+        # Calc the hash of the pattern and string[0:lengthP]
+        hashS = 0
+        hashP = 0
+        for i in range(lengthP):
+            hashS += ord(string[i])*(128**(lengthP-i-1))
+            hashP += ord(pattern[i])*(128**(lengthP-i-1))
+
+        # Explore the string until match
+        for i in range(lengthS-lengthP+1):
+            # Check if hashes match
+            if hashS == hashP:
+                # Possible coincidence, do strcmp()
+                if strcmp(substr(string, i, i+lengthP), pattern):
+                    # Here!
+                    result = i
+                    break
+
+            # Rehash
+            if i != lengthS-lengthP:
+                hashS -= (ord(string[i])*(128**(lengthP-1)))
+                hashS = hashS*128
+                hashS += ord(string[lengthP+i])
+
+        # Return the result
+        return result
+
+
 # Finite automata
 
 def FA_matcher(string, statesArray, finalState):
+    '''
+    Explanation: 
+        Searchs if a given state is reachable from the given string.
+    Params:
+        string: The string where will be searched the occurrence of pattern.
+        statesArray: The array that contains the states of the finite automata.
+        finalState: The desired state to reach.
+    Return:
+        An integer with the position where the pattern starts inside the string.
+        'None' if was not found.
+    '''
+    result = None
     currentState = 0
     lengthAlphabet = len(statesArray[0])
 
-
+    # Explore until match
     for i in range(len(string)):
         # Get index of character from the first row
         charIndex = h(ord(string[i]), statesArray[0], lengthAlphabet)
@@ -21,14 +86,24 @@ def FA_matcher(string, statesArray, finalState):
         if charIndex != None:  # Verify if is part of the alphabet
             currentState = statesArray[currentState+1][charIndex]
             if currentState == finalState:
-                print(f'Pattern in string here: [{i-finalState+1}, {i}]')
+                result = i-finalState+1
                 break
         else:
-            # An unrecognized character appears, need to start from state 0
+            # An unrecognized character appears, start again from state 0
             currentState = 0
+    return result
 
 
 def FA_computeTransition(pattern, alphabet):
+    '''
+    Explanation:
+        Generates the arrays of states of the finite automata for the given pattern.
+    Params:
+        pattern: The string to be analyzed from which the states will be generated 
+        alphabet: Each diffrent character included in pattern.
+    Return:
+        An Array, representing the states table of the finite automata.
+    '''
     def minimum(a, b):
         result = a
         if b < a:
@@ -73,12 +148,16 @@ def FA_computeTransition(pattern, alphabet):
             FA_Function[q+1][h(ord(alphabet[a]), FA_Function[0], lengthA)] = k
     return FA_Function
 
-
-p1 = String('ababaca')
-a1 = String('cba')
-A = FA_computeTransition(p1, a1)
-for e in A:
-    print(e)
-FA_matcher('-ababaababaca', A, 7)
-
 # Knuth Morris Pratt
+
+
+# Testing
+string1 = String('-ababaababaca')
+pattern1 = String('ababaca')
+alphabet1 = String('cba')
+
+
+print(RK_matcher(string1, pattern1))
+
+statesArr = FA_computeTransition(pattern1, alphabet1)
+print(FA_matcher(string1, statesArr, 7))
