@@ -3,6 +3,7 @@
 from lib.algo1 import *
 from lib.strcmpAlt import *
 from lib.hashLinear import hashLinear as h
+from lib import linkedlist as LL
 
 
 # Find biggest prefix
@@ -205,8 +206,8 @@ def FA_computeTransition(pattern, alphabet):
             FA_Function[q+1][h(ord(alphabet[a]), FA_Function[0], lengthA)] = k
     return FA_Function
 
-# Knuth Morris Pratt
 
+# Knuth Morris Pratt
 
 def KMP_matcher(string, pattern):
     '''
@@ -276,11 +277,55 @@ def KMP_computePrefixFn(pattern):
     return prefixFn
 
 
+# Knuth Morris Pratt (Mod)
+
+def KMP_matcherMOD(string, pattern):
+    '''
+    Explanation: 
+        Find all the ocurrences of the pattern (without overlaping) in the given string.
+    Params:
+        string: The string where will be searched for occurrences of the pattern.
+        pattern: The pattern (string) to be searched.
+    Return:
+        A Linked List with the positions where the pattern occurs inside the string.
+        'None' if was not found.
+    '''
+    # Define a linkedList to store each index where the pattern appears
+    resultList = LL.LinkedList()
+
+    # Store lengths of both strings
+    lengthS = len(string)
+    lengthP = len(pattern)
+
+    # Check case same length, no need to search, only compare
+    if lengthS == lengthP:
+        if strcmp(string, pattern):
+            LL.add(resultList, 0)
+
+    # Check requisites for general case
+    else:
+        prefixFn = KMP_computePrefixFn(pattern)
+        matched = 0
+        for i in range(lengthS):
+            while matched > 0 and not strcmp(pattern[matched], string[i]):
+                matched = prefixFn[matched-1]
+
+            if strcmp(pattern[matched], string[i]):
+                matched += 1
+
+            if matched == lengthP:
+                LL.add(resultList, (i - (lengthP-1)))
+                matched = 0
+
+    # Return the result
+    return resultList
+
 # Testing
 
 string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
 alphabet1 = String('cba')
+
 
 print('----findBiggestPrefix----')
 print(findBiggestPrefix(string1, String('ba')))
@@ -288,6 +333,8 @@ print(findBiggestPrefix(string1, String('bac')))
 print(findBiggestPrefix(string1, String('baca')))
 print(findBiggestPrefix(string1, String('bacas')))
 print(findBiggestPrefix(string1, String('vacas')))
+
+
 
 print('\n----Matchers----')
 
@@ -300,3 +347,15 @@ print(
 
 
 print(f'Using KMP. Pattern starts at {KMP_matcher(string1, pattern1)}')
+
+
+
+print('\n----Matchers Mod 🔧----')
+List = KMP_matcherMOD(string1, String('ba'))
+
+actualNode = List.head
+print('The pattern appears in the folowing position/s = [', end='') # pǝʇɹǝʌuᴉ s,ʇᴉ 'sǝ⅄
+while actualNode.nextNode:
+    print(f'{actualNode.value}, ', end= '')
+    actualNode = actualNode.nextNode
+print(f'{actualNode.value}]')
