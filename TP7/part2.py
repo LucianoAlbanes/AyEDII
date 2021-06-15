@@ -327,7 +327,7 @@ pattern1 = String('ababaca')
 alphabet1 = String('cba')
 
 
-print('----findBiggestPrefix----')
+print('---- findBiggestPrefix ----')
 print(findBiggestPrefix(string1, String('ba')))
 print(findBiggestPrefix(string1, String('bac')))
 print(findBiggestPrefix(string1, String('baca')))
@@ -336,7 +336,7 @@ print(findBiggestPrefix(string1, String('vacas')))
 
 
 
-print('\n----Matchers----')
+print('\n---- Matchers ----')
 
 print(f'Using Rabin Karp. Pattern starts at {RK_matcher(string1, pattern1)}')
 
@@ -350,8 +350,8 @@ print(f'Using KMP. Pattern starts at {KMP_matcher(string1, pattern1)}')
 
 
 
-print('\n----Matchers Mod 🔧----')
-List = KMP_matcherMOD(string1, String('ba'))
+print('\n---- KMP Mod 🔧----')
+List = KMP_matcherMOD(string1, String('aba'))
 
 actualNode = List.head
 print('The pattern appears in the folowing position/s = [', end='') # pǝʇɹǝʌuᴉ s,ʇᴉ 'sǝ⅄
