@@ -2,7 +2,6 @@
 # Part 2 of Pattern Matching
 from lib.algo1 import *
 from lib.strcmpAlt import *
-from lib import linkedlist as LL
 from lib.hashLinear import hashLinear as h
 
 
@@ -151,13 +150,86 @@ def FA_computeTransition(pattern, alphabet):
 # Knuth Morris Pratt
 
 
+def KMP_matcher(string, pattern):
+    '''
+    Explanation: 
+        Searchs if the pattern is contained on string.
+    Params:
+        string: The string where will be searched the occurrence of pattern.
+        pattern: The pattern (string) to be searched.
+    Return:
+        An integer with the position where the pattern starts inside the string.
+        'None' if was not found.
+    '''
+    # Define a variable to store the return of this function (index where apears)
+    result = None
+
+    # Store lengths of both strings
+    lengthS = len(string)
+    lengthP = len(pattern)
+
+    # Check case same length, no need to search, only compare
+    if lengthS == lengthP:
+        if strcmp(string, pattern):
+            result = 0
+
+    # Check requisites for general case
+    else:
+        prefixFn = KMP_computePrefixFn(pattern)
+        matched = 0
+        for i in range(lengthS):
+            while matched > 0 and not strcmp(pattern[matched], string[i]):
+                matched = prefixFn[matched-1]
+
+            if strcmp(pattern[matched], string[i]):
+                matched += 1
+
+            if matched == lengthP:
+                result = i - (lengthP-1)
+
+    # Return the result
+    return result 
+
+
+def KMP_computePrefixFn(pattern):
+    '''
+    Explanation:
+        Generates the prefixes function of the given pattern.
+    Params:
+        pattern: The string to be analyzed from which the prefix function will be created.
+    Return:
+        An Array (n*1).
+    '''
+    lengthP = len(pattern)
+    prefixFn = Array(lengthP, 0)
+    prefixFn[0] = 0
+    k = 0
+
+    for q in range(2, lengthP+1):
+        while k > 0 and not strcmp(pattern[k], pattern[q-1]):
+            k = prefixFn[k-1]
+
+        if strcmp(pattern[k], pattern[q-1]):
+            k += 1
+
+        prefixFn[q-1] = k
+
+    # Return the generated prefix function
+    return prefixFn
+
+
 # Testing
+
 string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
 alphabet1 = String('cba')
 
 
-print(RK_matcher(string1, pattern1))
+print(f'Using Rabin Karp. Pattern starts at {RK_matcher(string1, pattern1)}')
+
 
 statesArr = FA_computeTransition(pattern1, alphabet1)
-print(FA_matcher(string1, statesArr, 7))
+print(f'Using Finite Automata. Pattern starts at {FA_matcher(string1, statesArr, len(pattern1))}')
+
+
+print(f'Using KMP. Pattern starts at {KMP_matcher(string1, pattern1)}')
