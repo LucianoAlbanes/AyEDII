@@ -5,6 +5,64 @@ from lib.strcmpAlt import *
 from lib.hashLinear import hashLinear as h
 
 
+# Find biggest prefix
+
+def findBiggestPrefix(string, prefixStr):
+    '''
+    Explanation: 
+        Searchs for the biggest prefix of one string in another.
+    Params:
+        string: The string where will be searched for the ocurrences of prefixes.
+        prefixStr: The string to extract prefixes
+    Return:
+        An integer with the position where the biggest prefix starts inside the string.
+        'None' if there are not prefixes.
+    '''
+    # Define a result to store how many characters was found as prefix
+    charactersFound = 0
+
+    # Store lengths of both strings
+    lengthS = len(string)
+    lengthP = len(prefixStr)
+
+    # Check requisites for general case
+    if not strcmpAlt(prefixStr, String('')):
+        # Calc the hash of strings of length 1
+        hashS = ord(string[0])
+        hashP = ord(prefixStr[0])
+
+        # Save where the biggest prefix was found
+        foundAt = 0
+
+        # Explore the string until match
+        i = 0
+        while i < (lengthS-foundAt):
+
+            # Check if hashes match, compare and increment (new biggest prefix found)
+            while hashS == hashP and strcmp(substr(string, i, i+charactersFound), substr(prefixStr, 0, charactersFound)):
+                foundAt = i
+                charactersFound += 1
+                if charactersFound == lengthP or foundAt+charactersFound == lengthS:  # Max prefix reached
+                    break
+                hashS = 128*hashS + ord(string[i+charactersFound])
+                hashP = 128*hashP + ord(prefixStr[charactersFound])
+
+            # Rehash (+1 position)
+            if i < lengthS-charactersFound-1:
+                hashS -= (ord(string[i])*(128**(charactersFound)))
+                hashS = hashS*128
+                hashS += ord(string[charactersFound+i+1])
+
+            # Increment while loop
+            i += 1
+
+    # Verify return
+    result = None
+    if charactersFound > 0:
+        result = foundAt
+    return result
+
+
 # Rabin Karp
 
 def RK_matcher(string, pattern):
@@ -188,7 +246,7 @@ def KMP_matcher(string, pattern):
                 result = i - (lengthP-1)
 
     # Return the result
-    return result 
+    return result
 
 
 def KMP_computePrefixFn(pattern):
@@ -224,12 +282,21 @@ string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
 alphabet1 = String('cba')
 
+print('----findBiggestPrefix----')
+print(findBiggestPrefix(string1, String('ba')))
+print(findBiggestPrefix(string1, String('bac')))
+print(findBiggestPrefix(string1, String('baca')))
+print(findBiggestPrefix(string1, String('bacas')))
+print(findBiggestPrefix(string1, String('vacas')))
+
+print('\n----Matchers----')
 
 print(f'Using Rabin Karp. Pattern starts at {RK_matcher(string1, pattern1)}')
 
 
 statesArr = FA_computeTransition(pattern1, alphabet1)
-print(f'Using Finite Automata. Pattern starts at {FA_matcher(string1, statesArr, len(pattern1))}')
+print(
+    f'Using Finite Automata. Pattern starts at {FA_matcher(string1, statesArr, len(pattern1))}')
 
 
 print(f'Using KMP. Pattern starts at {KMP_matcher(string1, pattern1)}')
