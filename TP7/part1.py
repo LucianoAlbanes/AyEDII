@@ -161,7 +161,7 @@ def isAnagram(string1, string2):
 
             # Check if exist to increment, otherwise add it.
             if actualChar:
-                # Exists. Increment, compare with actual mostRepeated
+                # Exists. Increment.
                 actualChar.value += 1
             else:
                 # Not exists, add with value 1 into the hash table

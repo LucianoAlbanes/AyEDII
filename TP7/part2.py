@@ -1,5 +1,6 @@
 # Implementation of patter matching exercises
 # Part 2 of Pattern Matching
+from part1 import isContained
 from lib.algo1 import *
 from lib.strcmpAlt import *
 from lib.hashLinear import hashLinear as h
@@ -8,7 +9,7 @@ from lib import linkedlist as LL
 
 # Find biggest prefix
 
-def findBiggestPrefix(string, prefixStr):
+def findBiggestPrefix(string, prefix):
     '''
     Explanation: 
         Searchs for the biggest prefix of one string in another.
@@ -19,49 +20,38 @@ def findBiggestPrefix(string, prefixStr):
         An integer with the position where the biggest prefix starts inside the string.
         'None' if there are not prefixes.
     '''
-    # Define a result to store how many characters was found as prefix
-    charactersFound = 0
+    # Create the alphabet of prefix
+    alphabet = String('')
+    for i in range(len(prefix)):
+        if not isContained(alphabet, prefix[i]):
+            alphabet = concat(alphabet, String(prefix[i]))
 
-    # Store lengths of both strings
-    lengthS = len(string)
-    lengthP = len(prefixStr)
+    # Create the FSA function
+    statesArray = FA_computeTransition(prefix, alphabet)
 
-    # Check requisites for general case
-    if not strcmpAlt(prefixStr, String('')):
-        # Calc the hash of strings of length 1
-        hashS = ord(string[0])
-        hashP = ord(prefixStr[0])
+    # Find biggest prefix using FSA Matcher like algorithm
+    maxState = 0
+    currentState = 0
+    lengthAlphabet = len(statesArray[0])
+    finalState = len(prefix)
 
-        # Save where the biggest prefix was found
-        foundAt = 0
+    # Explore until match
+    for i in range(len(string)):
+        # Get index of character from the first row
+        charIndex = h(ord(string[i]), statesArray[0], lengthAlphabet)
 
-        # Explore the string until match
-        i = 0
-        while i < (lengthS-foundAt):
+        if charIndex != None:  # Verify if is part of the alphabet
+            currentState = statesArray[currentState+1][charIndex]
+            if currentState > maxState:  # New biggest prefix apears, save it.
+                maxState = currentState
+            if currentState == finalState:
+                break
+        else:
+            # An unrecognized character appears, start again from state 0
+            currentState = 0
 
-            # Check if hashes match, compare and increment (new biggest prefix found)
-            while hashS == hashP and strcmp(substr(string, i, i+charactersFound), substr(prefixStr, 0, charactersFound)):
-                foundAt = i
-                charactersFound += 1
-                if charactersFound == lengthP or foundAt+charactersFound == lengthS:  # Max prefix reached
-                    break
-                hashS = 128*hashS + ord(string[i+charactersFound])
-                hashP = 128*hashP + ord(prefixStr[charactersFound])
-
-            # Rehash (+1 position)
-            if i < lengthS-charactersFound-1:
-                hashS -= (ord(string[i])*(128**(charactersFound)))
-                hashS = hashS*128
-                hashS += ord(string[charactersFound+i+1])
-
-            # Increment while loop
-            i += 1
-
-    # Verify return
-    result = None
-    if charactersFound > 0:
-        result = foundAt
-    return result
+    # Return the sub string of the found biggest prefix
+    return substr(prefix, 0, maxState)
 
 
 # Rabin Karp
@@ -232,7 +222,7 @@ def KMP_matcher(string, pattern):
         if strcmp(string, pattern):
             result = 0
 
-    # Check requisites for general case
+    # General case
     else:
         prefixFn = KMP_computePrefixFn(pattern)
         matched = 0
@@ -245,6 +235,7 @@ def KMP_matcher(string, pattern):
 
             if matched == lengthP:
                 result = i - (lengthP-1)
+                break
 
     # Return the result
     return result
@@ -302,7 +293,7 @@ def KMP_matcherMOD(string, pattern):
         if strcmp(string, pattern):
             LL.add(resultList, 0)
 
-    # Check requisites for general case
+    # General case
     else:
         prefixFn = KMP_computePrefixFn(pattern)
         matched = 0
@@ -322,6 +313,7 @@ def KMP_matcherMOD(string, pattern):
 
 # Testing
 
+
 string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
 alphabet1 = String('cba')
@@ -333,7 +325,7 @@ print(findBiggestPrefix(string1, String('bac')))
 print(findBiggestPrefix(string1, String('baca')))
 print(findBiggestPrefix(string1, String('bacas')))
 print(findBiggestPrefix(string1, String('vacas')))
-
+print(findBiggestPrefix(string1, String('acas')))
 
 
 print('\n---- Matchers ----')
@@ -349,13 +341,12 @@ print(
 print(f'Using KMP. Pattern starts at {KMP_matcher(string1, pattern1)}')
 
 
-
 print('\n---- KMP Mod 🔧----')
 List = KMP_matcherMOD(string1, String('aba'))
 
 actualNode = List.head
 print('The pattern appears in the folowing position/s = [', end='') # pǝʇɹǝʌuᴉ s,ʇᴉ 'sǝ⅄
 while actualNode.nextNode:
-    print(f'{actualNode.value}, ', end= '')
+    print(f'{actualNode.value}, ', end='')
     actualNode = actualNode.nextNode
 print(f'{actualNode.value}]')
