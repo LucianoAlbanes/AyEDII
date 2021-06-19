@@ -26,35 +26,29 @@ def findBiggestPrefix(string, prefix):
     lengthS = len(string)
     lengthP = len(prefix)
 
-    # Check case same length, no need to search, only compare
-    if lengthS == lengthP:
-        if strcmp(string, prefix):
-            result = prefix
-
     # General case
-    else:
-        prefixFn = KMP_computePrefixFn(prefix)  # O(n)
-        matched = 0
-        initPos = 0
-        maxMatched = 0
-        for i in range(lengthS):  # O(m)
-            while matched > 0 and not strcmp(prefix[matched], string[i]):
-                matched = prefixFn[matched-1]
+    prefixFn = KMP_computePrefixFn(prefix)  # O(n)
+    matched = 0
+    initPos = 0
+    maxMatched = 0
+    for i in range(lengthS):  # O(m)
+        while matched > 0 and not strcmp(prefix[matched], string[i]):
+            matched = prefixFn[matched-1]
 
-            if strcmp(prefix[matched], string[i]):
-                matched += 1
+        if strcmp(prefix[matched], string[i]):
+            matched += 1
 
-            if matched > maxMatched:
-                # New biggest prefix
-                initPos = i - (lengthP-1)
-                maxMatched = matched
+        if matched > maxMatched:
+            # New biggest prefix
+            initPos = i - matched + 1
+            maxMatched = matched
 
-            if matched == lengthP:
-                break
+        if matched >= lengthP:
+            break
 
-        # Set the result variable as an string with the biggest prefix
-        if maxMatched > 0:
-            result = substr(string, initPos, initPos+maxMatched)
+    # Set the result variable as an string with the biggest prefix
+    if maxMatched > 0:
+        result = substr(string, initPos, initPos+maxMatched)
 
     # Return the result
     return result
@@ -318,7 +312,6 @@ def KMP_matcherMOD(string, pattern):
     return resultList
 
 # Testing
-
 
 string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
