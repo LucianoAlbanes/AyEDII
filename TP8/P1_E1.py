@@ -49,7 +49,7 @@ def darCambioBacktrack(residue, coinIndex, coinsArray, actualdepth, bestDepth, s
         coinsArray: The array with the denominations of each coin.
         actualDepth: The depth of the current call.
         bestDepth: The actual minimun amount of coins already discovered to reach the change.
-        skipCoins: The index of the already checked coins, (Prevent permutations).
+        skipCoins: The amount of the already checked coins, (Prevent permutations).
     '''
     # Compute current state (call) values
     residue -= coinsArray[coinIndex]

@@ -20,9 +20,8 @@ def mochila(maxWeight, cansArray):
     # Sort cans weight (Descending)
     cansArray = sort(cansArray)
 
-    # Declare a variable to store the min remaining weight reached and an array with that cans
+    # Declare a variable to store the min remaining weight reached
     minRemainingWeight = None
-    arrayMaxWeight = None
 
     # Result array of cans
     resultArray = None
@@ -53,7 +52,7 @@ def mochilaBacktrack(leftWeight, actualCan, cansArray, depth, minRemainingWeight
         cansArray: The array with the remaining cans.
         depth: The depth of the current call.
         minRemainingWeight: The minimum weight residue already reached.
-        skipCans: The index of the already checked cans, (Prevent permutations).
+        skipCans: The amount of the already checked cans, (Prevent permutations).
     '''
     # Result array of cans
     resultArray = None

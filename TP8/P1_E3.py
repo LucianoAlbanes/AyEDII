@@ -1,20 +1,9 @@
-'''
+# Part 1 of 'Análisis y Diseño de Algoritmos'
+# Backtracking
 
-Implementar la función Subsecuencia Creciente que devuelva un array con la mayor cantidad de elementos
-del array de entrada que formen una secuencia monótona creciente.
-Los elementos en el resultado deben aparecer en el mismo orden en que aparecían en el array de entrada,
-y no tienen que ser consecutivos dentro de este.
-Por ejemplo, la mayor subsecuencia creciente en [5, 1, 2, 3, 100, 20, 17, 8, 19, 21] es [1, 2, 3, 8, 19, 21]. 
-
-def subsecuenciaCreciente(numeros): 
-Descripción: Implementa la función SubsecuenciaCreciente 
-Entrada: numeros array de números naturales.
-Salida: retorna array de números con la mayor subsecuencia creciente en el array de entrada numero.
-
-
-'''
 from lib.algo1 import *
 
+# Exercise 3
 
 def subsecuenciaCreciente(numbersArray):
     '''
