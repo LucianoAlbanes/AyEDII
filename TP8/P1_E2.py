@@ -6,13 +6,12 @@ from lib.sortArray import insertionSortR as sort
 
 # Exercise 2
 
-
 def mochila(maxWeight, cansArray):
     '''
     Explanation:
         Finds the best arraignments of cans to reach the maximum possible weight.
     Parameters:
-        maxWeight: The amount of pesos to be reached.
+        maxWeight: The maximum amount of weight that the backpack can carry.
         cansArray: An array with the weights of each can.
     Return:
         An array with the cans that maximize the weight in the backpack.

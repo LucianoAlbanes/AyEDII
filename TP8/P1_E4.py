@@ -6,22 +6,6 @@ from lib.sortArray import insertionSortR as sort
 
 # Exercise 4
 
-'''
-
-Dado un array X de números enteros positivos y un número entero de T, implementar un algoritmo
-que devuelva si existe un subconjunto de elementos en X que suman el valor T. Por ejemplo si X = {8, 6, 7, 5, 3, 10, 9} y T = 15,
-la respuesta es True, porque los subconjuntos {8, 7} , {7, 5, 3} , {6, 9} , {5,10}
-todos suman 15. Con este otro ejemplo X = {11, 6, 5, 1, 7, 13, 12} y T = 15, la respuesta es False.
-
-    def subconjuntoSuma(numeros, valor):
-    Descripción: Implementa la función Subconjunto Suma
-    Entrada: numeros array de enteros positivos, valor entero positivo.
-    Salida: retorna True si existe un grupo de enteros en números cuya
-    suma del valor de entrada.
-
-'''
-
-
 def subconjuntoSuma(numbersArray, value):
     '''
     Explanation:

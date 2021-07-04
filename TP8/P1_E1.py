@@ -6,7 +6,6 @@ from lib.sortArray import insertionSortR as sort
 
 # Exercise 1
 
-
 def darCambio(change, coins):
     '''
     Explanation:
