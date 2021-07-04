@@ -1,7 +1,6 @@
 # Part 3 of 'Análisis y Diseño de Algoritmos'
 # Divide and conquer
 
-from lib.algo1 import *
 
 # Exercise 8
 
@@ -11,10 +10,10 @@ def busquedaBinaria(numbersList, value):
     Explanation:
         Searches for the given value into an array of numbers (already sorted in ascending order).
     Parameters:
-        numbersList: An array with numbers where the value will be .
-        maxWeight: The maximum amount of weight that the backpack can carry.
+        numbersList: An array with numbers where the value will be inside.
+        value: The value to be found.
     Return:
-        An array with the cans that maximize the profit in the backpack.
+        The index where the value is located in the array, 'None' otherwise.
     '''
     # Call the recursive function, using divide and conquer
     # Return the result
@@ -26,7 +25,7 @@ def divideBBinaria(array, i, j, value):
     ''' Recursive, divide and conquer. Div the array by 2'''
     # Define result and middle index
     result = None
-    mid = int((j-i)/2) + i
+    mid = int((j+i)/2)
 
     # Base case
     if array[mid] == value:
