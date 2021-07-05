@@ -11,7 +11,7 @@ def darCambio(change, coins):
     Explanation:
         Returns the minimum amount of coins to be given to reach a specified amount of pesos.
     Info:
-        The supply of coins are unlimited.
+        The supply of coins are unlimited, and the coin of value 1 will be into the coins array.
     Parameters:
         change: The amount of pesos to be reached.
         coins: An array with the denominations of each coin.
@@ -92,4 +92,4 @@ def biggest(a, b):
 
 
 print(darCambio(14, [1, 2, 8, 6, 10]))
-print(darCambio(109, [6, 9, 4, 16]))
+print(darCambio(109, [1, 6, 9, 4, 16]))
