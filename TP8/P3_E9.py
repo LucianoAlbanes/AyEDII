@@ -56,18 +56,18 @@ def divideBK(array, low, high, index):
             array[border] = array[i]
             array[i] = temp
 
+    # Return pivot to correct position
+    temp = array[low]
+    array[low] = array[border]
+    array[border] = temp
+
     # Verify final pos of the pivot. If match with index, return it. otherwise contine recursion
     result = None
     if border == index:
         # Base case. Get the value and return it
-        result = array[low]
+        result = array[border]
     else:
         # General case
-        # Return pivot to correct position
-        temp = array[low]
-        array[low] = array[border]
-        array[border] = temp
-
         # Continue recursion with useful part
         if border < index:
             result = divideBK(array, border+1, high, index)
@@ -79,6 +79,7 @@ def divideBK(array, low, high, index):
 
 
 # TEST
-a = [99, 33, 88, 66, 22, 55, 11, 77, 44, 00]
-for i in range(10):
-    print(busquedaKesimo(a, i))
+if '__main__' == __name__:
+    a = [99, 33, 88, 66, 22, 55, 11, 77, 44, 00]
+    for i in range(10):
+        print(busquedaKesimo(a, i))

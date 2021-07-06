@@ -7,7 +7,7 @@ from lib.algo1 import *
 # Exercise 13
 
 
-def canSumSet(setNum, number):
+def puedenSumar(setNum, number):
     # Define useful values
     numsQuant = len(setNum)
 
@@ -48,5 +48,5 @@ def canSumSet(setNum, number):
 
 
 # TEST
-print(canSumSet([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 50))
-print(canSumSet([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 500))
+print(puedenSumar([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 50))
+print(puedenSumar([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 500))
