@@ -1,4 +1,4 @@
-# Part 3 of 'Análisis y Diseño de Algoritmos'
+# Part 4 of 'Análisis y Diseño de Algoritmos'
 # Dynamic programming
 
 from lib.algo1 import *

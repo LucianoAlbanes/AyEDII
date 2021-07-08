@@ -21,6 +21,7 @@ def contiguoMediana(numberList, k):
 
     # Move the adjacent k/2 values next to median
     # (with divideBk, move elements median+-k/2-1)
+    # Won't be ordered, but will be the correct ones
     if posMedian-k_low-1 > 0:
         divideBK(numberList, 0, posMedian-1, posMedian-k_low-1)
     if posMedian+k_high+1 < length:
