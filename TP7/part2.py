@@ -1,6 +1,5 @@
 # Implementation of patter matching exercises
 # Part 2 of Pattern Matching
-from part1 import isContained
 from lib.algo1 import *
 from lib.strcmpAlt import *
 from lib.hashLinear import hashLinear as h
@@ -15,43 +14,44 @@ def findBiggestPrefix(string, prefix):
         Searchs for the biggest prefix of one string in another.
     Params:
         string: The string where will be searched for the ocurrences of prefixes.
-        prefixStr: The string to extract prefixes
+        prefix: The string to extract prefixes
     Return:
-        An integer with the position where the biggest prefix starts inside the string.
-        'None' if there are not prefixes.
+        The biggest prefix found.
+        If no prefixes are found, will return an empty string.
     '''
-    # Create the alphabet of prefix
-    alphabet = String('')
-    for i in range(len(prefix)):
-        if not isContained(alphabet, prefix[i]):
-            alphabet = concat(alphabet, String(prefix[i]))
+    # Define a result variable to store the return of this function (biggest prefix as string)
+    result = String('')
 
-    # Create the FSA function
-    statesArray = FA_computeTransition(prefix, alphabet)
+    # Store lengths of both strings
+    lengthS = len(string)
+    lengthP = len(prefix)
 
-    # Find biggest prefix using FSA Matcher like algorithm
-    maxState = 0
-    currentState = 0
-    lengthAlphabet = len(statesArray[0])
-    finalState = len(prefix)
+    # General case
+    prefixFn = KMP_computePrefixFn(prefix)  # O(n)
+    matched = 0
+    initPos = 0
+    maxMatched = 0
+    for i in range(lengthS):  # O(m)
+        while matched > 0 and not strcmp(prefix[matched], string[i]):
+            matched = prefixFn[matched-1]
 
-    # Explore until match
-    for i in range(len(string)):
-        # Get index of character from the first row
-        charIndex = h(ord(string[i]), statesArray[0], lengthAlphabet)
+        if strcmp(prefix[matched], string[i]):
+            matched += 1
 
-        if charIndex != None:  # Verify if is part of the alphabet
-            currentState = statesArray[currentState+1][charIndex]
-            if currentState > maxState:  # New biggest prefix apears, save it.
-                maxState = currentState
-            if currentState == finalState:
-                break
-        else:
-            # An unrecognized character appears, start again from state 0
-            currentState = 0
+        if matched > maxMatched:
+            # New biggest prefix
+            initPos = i - matched + 1
+            maxMatched = matched
 
-    # Return the sub string of the found biggest prefix
-    return substr(prefix, 0, maxState)
+        if matched >= lengthP:
+            break
+
+    # Set the result variable as an string with the biggest prefix
+    if maxMatched > 0:
+        result = substr(string, initPos, initPos+maxMatched)
+
+    # Return the result
+    return result
 
 
 # Rabin Karp
@@ -312,7 +312,6 @@ def KMP_matcherMOD(string, pattern):
     return resultList
 
 # Testing
-
 
 string1 = String('-ababaababaca')
 pattern1 = String('ababaca')
